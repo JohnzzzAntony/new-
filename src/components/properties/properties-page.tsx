@@ -48,8 +48,8 @@ export function PropertiesPage() {
           render: (v: any) => <StatusBadge status={v} map={TYPE_BADGE_MAP} />
         },
         { key: 'totalArea', label: 'Area (sqft)', render: (v: any) => v ? v.toLocaleString() : '-' },
-        { key: 'companyName', label: 'Company', render: (v: any) => v || '-' },
-        { key: '_count', label: 'Units', render: (v: any) => v?.units || 0 },
+        { key: 'company', label: 'Company', render: (_: any, row: any) => row.company?.name || '-' },
+        { key: 'unitCount', label: 'Units', render: (v: any) => v || 0 },
         {
           key: 'isActive',
           label: 'Status',

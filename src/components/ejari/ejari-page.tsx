@@ -32,8 +32,8 @@ export function EjariPage() {
       searchPlaceholder="Search EJARI registrations..."
       columns={[
         { key: 'ejariNumber', label: 'EJARI #', render: (v: any) => <span className="font-mono font-medium">{v || 'Pending'}</span> },
-        { key: 'subleaseNumber', label: 'Sublease', render: (v: any) => v || '-' },
-        { key: 'subtenantName', label: 'Subtenant', render: (v: any) => v || '-' },
+        { key: 'sublease', label: 'Sublease', render: (_: any, row: any) => row.sublease?.subleaseNumber || '-' },
+        { key: 'subtenant', label: 'Subtenant', render: (_: any, row: any) => row.subtenant?.name || '-' },
         { key: 'registrationDate', label: 'Registration', render: (v: any) => formatDate(v) },
         { key: 'expiryDate', label: 'Expiry', render: (v: any) => {
           if (!v) return '-'

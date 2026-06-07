@@ -41,8 +41,8 @@ export function SubleasesPage() {
       searchPlaceholder="Search subleases..."
       columns={[
         { key: 'subleaseNumber', label: 'Sublease #', render: (v: any) => <span className="font-mono font-medium">{v}</span> },
-        { key: 'unitNumber', label: 'Unit', render: (v: any) => v || '-' },
-        { key: 'subtenantName', label: 'Subtenant', render: (v: any) => v || '-' },
+        { key: 'unit', label: 'Unit', render: (_: any, row: any) => row.unit?.unitNumber || '-' },
+        { key: 'subtenant', label: 'Subtenant', render: (_: any, row: any) => row.subtenant?.name || '-' },
         { key: 'startDate', label: 'Start', render: (v: any) => formatDate(v) },
         { key: 'endDate', label: 'End', render: (v: any) => formatDate(v) },
         { key: 'rentAmount', label: 'Rent', render: (v: any) => formatCurrency(v) },

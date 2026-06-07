@@ -45,7 +45,7 @@ export function UnitsPage() {
         { key: 'status', label: 'Status', render: (v: any) => <StatusBadge status={v} map={UNIT_STATUS_MAP} /> },
         { key: 'area', label: 'Area (sqft)', render: (v: any) => v ? v.toLocaleString() : '-' },
         { key: 'rentAmount', label: 'Rent', render: (v: any) => formatCurrency(v) },
-        { key: 'propertyName', label: 'Property', render: (v: any) => v || '-' },
+        { key: 'property', label: 'Property', render: (_: any, row: any) => row.property?.name || '-' },
       ]}
       filterOptions={[
         { key: 'unitType', label: 'Type', options: UNIT_TYPES },

@@ -40,8 +40,8 @@ export function MainLeasesPage() {
       searchPlaceholder="Search main leases..."
       columns={[
         { key: 'leaseNumber', label: 'Lease #', render: (v: any) => <span className="font-mono font-medium">{v}</span> },
-        { key: 'propertyName', label: 'Property', render: (v: any) => v || '-' },
-        { key: 'companyName', label: 'Company', render: (v: any) => v || '-' },
+        { key: 'property', label: 'Property', render: (_: any, row: any) => row.property?.name || '-' },
+        { key: 'company', label: 'Company', render: (_: any, row: any) => row.company?.name || '-' },
         { key: 'startDate', label: 'Start', render: (v: any) => formatDate(v) },
         { key: 'endDate', label: 'End', render: (v: any) => formatDate(v) },
         { key: 'rentAmount', label: 'Rent', render: (v: any) => formatCurrency(v) },

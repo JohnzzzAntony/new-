@@ -381,9 +381,17 @@ export const COMPLIANCE_STATUS_MAP: Record<string, { label: string; class: strin
   ACTION_REQUIRED: { label: 'Action Required', class: 'bg-orange-100 text-orange-700' },
 }
 
-export function formatDate(d: string | null | undefined) {
+export function formatDate(d: string | Date | null | undefined) {
   if (!d) return '-'
-  try { return format(new Date(d), 'dd MMM yyyy') } catch { return d }
+  try {
+    const date = typeof d === 'string' ? new Date(d) : d
+    if (isNaN(date.getTime())) return '-'
+    const day = date.getDate().toString().padStart(2, '0')
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+    const month = months[date.getMonth()]
+    const year = date.getFullYear()
+    return `${day} ${month} ${year}`
+  } catch { return String(d) }
 }
 
 export function formatCurrency(n: number | null | undefined) {

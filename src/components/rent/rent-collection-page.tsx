@@ -260,7 +260,7 @@ export function RentCollectionPage() {
                       receipts.map((rct) => (
                         <tr key={rct.id} className="border-b last:border-0 hover:bg-gray-50/50">
                           <td className="py-3 px-4 font-mono text-xs font-medium">{rct.receiptNumber}</td>
-                          <td className="py-3 px-4">{rct.invoiceNumber || '-'}</td>
+                          <td className="py-3 px-4">{rct.invoice?.invoiceNumber || '-'}</td>
                           <td className="py-3 px-4 text-right text-emerald-600 font-medium">{formatCurrency(rct.amount)}</td>
                           <td className="py-3 px-4">{formatDate(rct.paymentDate)}</td>
                           <td className="py-3 px-4"><Badge variant="outline" className="text-xs">{(rct.paymentMethod || '').replace('_', ' ')}</Badge></td>
@@ -299,7 +299,7 @@ export function RentCollectionPage() {
               <Select value={invoiceData.subleaseId || ''} onValueChange={v => setInvoiceData({...invoiceData, subleaseId: v})}>
                 <SelectTrigger><SelectValue placeholder="Select sublease" /></SelectTrigger>
                 <SelectContent>
-                  {subleases.map(s => <SelectItem key={s.id} value={s.id}>{s.subleaseNumber} - {s.subtenantName}</SelectItem>)}
+                  {subleases.map(s => <SelectItem key={s.id} value={s.id}>{s.subleaseNumber} - {s.subtenant?.name || s.subtenantName}</SelectItem>)}
                 </SelectContent>
               </Select>
             </FormField>

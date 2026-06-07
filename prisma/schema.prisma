@@ -1,0 +1,552 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// AUTHENTICATION & RBAC
+// ============================================
+
+enum UserRole {
+  SUPER_ADMIN
+  PROPERTY_MANAGER
+  FINANCE_USER
+  READ_ONLY
+}
+
+model User {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  name          String
+  password      String
+  role          UserRole @default(PROPERTY_MANAGER)
+  isActive      Boolean  @default(true)
+  avatar        String?
+  lastLoginAt   DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  deletedAt     DateTime?
+
+  auditLogs     AuditLog[]
+
+  @@map("users")
+}
+
+// ============================================
+// COMPANY MANAGEMENT (Internal Tenant Companies)
+// ============================================
+
+model Company {
+  id              String   @id @default(cuid())
+  name            String
+  tradeName       String?
+  registrationNo  String?  @unique
+  tradeLicenseNo  String?
+  tradeLicenseExpiry DateTime?
+  address         String?
+  city            String?
+  country         String   @default("UAE")
+  phone           String?
+  email           String?
+  website         String?
+  contactPerson   String?
+  contactPhone    String?
+  contactEmail    String?
+  notes           String?
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  deletedAt       DateTime?
+
+  properties     Property[]
+  mainLeases     MainLease[]
+  documents      Document[]
+
+  @@map("companies")
+}
+
+// ============================================
+// PROPERTY MANAGEMENT
+// ============================================
+
+enum PropertyType {
+  RESIDENTIAL
+  COMMERCIAL
+  INDUSTRIAL
+  MIXED_USE
+  WAREHOUSE
+  PLOT
+}
+
+model Property {
+  id            String       @id @default(cuid())
+  name          String
+  propertyCode  String       @unique
+  propertyType  PropertyType @default(INDUSTRIAL)
+  description   String?
+  address       String
+  city          String       @default("Dubai")
+  area          String?
+  plotNumber    String?
+  totalArea     Float?       // sq ft
+  builtUpArea   Float?
+  yearBuilt     Int?
+  companyId     String
+  isActive      Boolean      @default(true)
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  deletedAt     DateTime?
+
+  company       Company      @relation(fields: [companyId], references: [id])
+  units         Unit[]
+  plots         Plot[]
+  mainLeases    MainLease[]
+  documents     Document[]
+
+  @@map("properties")
+}
+
+model Plot {
+  id            String   @id @default(cuid())
+  plotNumber    String
+  area          Float?   // sq ft
+  zoning        String?
+  status        String   @default("available") // available, leased, reserved
+  notes         String?
+  propertyId    String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  deletedAt     DateTime?
+
+  property      Property @relation(fields: [propertyId], references: [id])
+
+  @@unique([plotNumber, propertyId])
+  @@map("plots")
+}
+
+// ============================================
+// UNIT MANAGEMENT
+// ============================================
+
+enum UnitType {
+  WAREHOUSE
+  OFFICE
+  SHOP
+  APARTMENT
+  VILLA
+  STORAGE_UNIT
+  PARKING
+}
+
+enum UnitStatus {
+  VACANT
+  OCCUPIED
+  UNDER_MAINTENANCE
+  RESERVED
+  INACTIVE
+}
+
+model Unit {
+  id            String     @id @default(cuid())
+  unitNumber    String
+  unitCode      String?
+  unitType      UnitType   @default(WAREHOUSE)
+  status        UnitStatus @default(VACANT)
+  floor         Int?
+  area          Float?     // sq ft
+  rentAmount    Float?
+  securityDeposit Float?
+  amenities     String?    // JSON string of amenities
+  description   String?
+  notes         String?
+  propertyId    String
+  isActive      Boolean    @default(true)
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  deletedAt     DateTime?
+
+  property      Property   @relation(fields: [propertyId], references: [id])
+  subleases     Sublease[]
+  documents     Document[]
+
+  @@unique([unitNumber, propertyId])
+  @@map("units")
+}
+
+// ============================================
+// MAIN LEASE MANAGEMENT (DREC Leases)
+// ============================================
+
+enum LeaseStatus {
+  DRAFT
+  ACTIVE
+  EXPIRED
+  TERMINATED
+  RENEWED
+  UNDER_REVIEW
+}
+
+enum LeaseRenewalStatus {
+  NONE
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model MainLease {
+  id               String            @id @default(cuid())
+  leaseNumber      String            @unique
+  startDate        DateTime
+  endDate          DateTime
+  rentAmount       Float
+  rentFrequency    String            @default("annual") // monthly, quarterly, annual
+  securityDeposit  Float?
+  incrementPercent Float?            // annual increment %
+  incrementFrequency Int?            // every N years
+  landlordName     String
+  landlordContact  String?
+  landlordEmail    String?
+  terms            String?           // JSON of terms
+  notes            String?
+  status           LeaseStatus       @default(DRAFT)
+  renewalStatus    LeaseRenewalStatus @default(NONE)
+  renewedFromId    String?
+  propertyId       String
+  companyId        String
+  isActive         Boolean           @default(true)
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  deletedAt        DateTime?
+
+  property         Property          @relation(fields: [propertyId], references: [id])
+  company          Company           @relation(fields: [companyId], references: [id])
+  renewedFrom      MainLease?        @relation("LeaseRenewals", fields: [renewedFromId], references: [id])
+  renewals         MainLease[]       @relation("LeaseRenewals")
+  subleases        Sublease[]
+  documents        Document[]
+
+  @@map("main_leases")
+}
+
+// ============================================
+// SUBTENANT MANAGEMENT
+// ============================================
+
+model Subtenant {
+  id                String   @id @default(cuid())
+  name              String
+  tradeName         String?
+  tradeLicenseNo    String?
+  tradeLicenseExpiry DateTime?
+  registrationNo    String?
+  contactPerson     String
+  phone             String
+  email             String
+  address           String?
+  city              String?
+  country           String   @default("UAE")
+  nationality       String?
+  emiratesId        String?
+  passportNo        String?
+  notes             String?
+  isActive          Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  deletedAt         DateTime?
+
+  subleases         Sublease[]
+  ejariRegistrations Ejari[]
+  documents         Document[]
+
+  @@map("subtenants")
+}
+
+// ============================================
+// SUBLEASE MANAGEMENT
+// ============================================
+
+enum SubleaseStatus {
+  DRAFT
+  ACTIVE
+  EXPIRED
+  TERMINATED
+  RENEWED
+  UNDER_REVIEW
+}
+
+model Sublease {
+  id               String          @id @default(cuid())
+  subleaseNumber   String          @unique
+  startDate        DateTime
+  endDate          DateTime
+  rentAmount       Float
+  rentFrequency    String          @default("monthly")
+  securityDeposit  Float?
+  incrementPercent Float?
+  incrementFrequency Int?
+  terms            String?
+  notes            String?
+  status           SubleaseStatus  @default(DRAFT)
+  renewalStatus    LeaseRenewalStatus @default(NONE)
+  renewedFromId    String?
+  mainLeaseId      String
+  unitId           String
+  subtenantId      String
+  isActive         Boolean         @default(true)
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  deletedAt        DateTime?
+
+  mainLease        MainLease       @relation(fields: [mainLeaseId], references: [id])
+  unit             Unit            @relation(fields: [unitId], references: [id])
+  subtenant        Subtenant       @relation(fields: [subtenantId], references: [id])
+  renewedFrom      Sublease?       @relation("SubleaseRenewals", fields: [renewedFromId], references: [id])
+  renewals         Sublease[]      @relation("SubleaseRenewals")
+  invoices         Invoice[]
+  ejariRegistrations Ejari[]
+  documents        Document[]
+
+  @@map("subleases")
+}
+
+// ============================================
+// EJARI MODULE
+// ============================================
+
+enum EjariStatus {
+  PENDING
+  REGISTERED
+  EXPIRED
+  RENEWAL_PENDING
+  CANCELLED
+}
+
+model Ejari {
+  id                String      @id @default(cuid())
+  ejariNumber       String?     @unique
+  registrationDate  DateTime?
+  expiryDate        DateTime?
+  certificateUrl    String?
+  status            EjariStatus @default(PENDING)
+  notes             String?
+  subleaseId        String
+  subtenantId       String
+  isActive          Boolean     @default(true)
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+  deletedAt         DateTime?
+
+  sublease          Sublease    @relation(fields: [subleaseId], references: [id])
+  subtenant         Subtenant   @relation(fields: [subtenantId], references: [id])
+  documents         Document[]
+
+  @@map("ejari_registrations")
+}
+
+// ============================================
+// RENT COLLECTION
+// ============================================
+
+enum InvoiceStatus {
+  DRAFT
+  ISSUED
+  PAID
+  PARTIALLY_PAID
+  OVERDUE
+  CANCELLED
+}
+
+enum PaymentMethod {
+  CASH
+  CHEQUE
+  BANK_TRANSFER
+  ONLINE
+  OTHER
+}
+
+model Invoice {
+  id              String        @id @default(cuid())
+  invoiceNumber   String        @unique
+  issueDate       DateTime
+  dueDate         DateTime
+  periodStart     DateTime
+  periodEnd       DateTime
+  rentAmount      Float
+  otherCharges    Float         @default(0)
+  vatAmount       Float         @default(0)
+  totalAmount     Float
+  amountPaid      Float         @default(0)
+  balanceDue      Float
+  status          InvoiceStatus @default(ISSUED)
+  notes           String?
+  subleaseId      String
+  isActive        Boolean       @default(true)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  deletedAt       DateTime?
+
+  sublease        Sublease      @relation(fields: [subleaseId], references: [id])
+  receipts        Receipt[]
+
+  @@map("invoices")
+}
+
+model Receipt {
+  id              String        @id @default(cuid())
+  receiptNumber   String        @unique
+  invoiceId       String
+  amount          Float
+  paymentDate     DateTime
+  paymentMethod   PaymentMethod @default(BANK_TRANSFER)
+  referenceNo     String?
+  bankName        String?
+  notes           String?
+  isActive        Boolean       @default(true)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  deletedAt       DateTime?
+
+  invoice         Invoice       @relation(fields: [invoiceId], references: [id])
+
+  @@map("receipts")
+}
+
+// ============================================
+// COMPLIANCE MODULE
+// ============================================
+
+enum ComplianceType {
+  LEASE_EXPIRY
+  EJARI_EXPIRY
+  TRADE_LICENSE_EXPIRY
+  INSURANCE_EXPIRY
+  OTHER
+}
+
+enum ComplianceStatus {
+  COMPLIANT
+  WARNING
+  EXPIRED
+  ACTION_REQUIRED
+}
+
+model ComplianceAlert {
+  id              String           @id @default(cuid())
+  type            ComplianceType
+  title           String
+  description     String?
+  entityType      String           // "MainLease", "Sublease", "Ejari", "Company"
+  entityId        String
+  expiryDate      DateTime
+  daysUntilExpiry Int?
+  status          ComplianceStatus @default(COMPLIANT)
+  isNotified      Boolean          @default(false)
+  notifiedAt      DateTime?
+  resolvedAt      DateTime?
+  notes           String?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  @@map("compliance_alerts")
+}
+
+// ============================================
+// DOCUMENT MANAGEMENT
+// ============================================
+
+enum DocumentType {
+  LEASE_AGREEMENT
+  TRADE_LICENSE
+  EJARI_CERTIFICATE
+  INSURANCE
+  ID_DOCUMENT
+  PASSPORT
+  OTHER
+}
+
+model Document {
+  id            String       @id @default(cuid())
+  name          String
+  documentType  DocumentType @default(OTHER)
+  fileUrl       String
+  fileSize      Int?
+  mimeType      String?
+  entityType    String       // "Company", "Property", "Unit", "MainLease", "Sublease", "Ejari", "Subtenant"
+  entityId      String
+  companyId     String?
+  propertyId    String?
+  unitId        String?
+  mainLeaseId   String?
+  subleaseId    String?
+  ejariId       String?
+  subtenantId   String?
+  uploadedBy    String?
+  isActive      Boolean      @default(true)
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  deletedAt     DateTime?
+
+  company       Company?     @relation(fields: [companyId], references: [id])
+  property      Property?    @relation(fields: [propertyId], references: [id])
+  unit          Unit?        @relation(fields: [unitId], references: [id])
+  mainLease     MainLease?   @relation(fields: [mainLeaseId], references: [id])
+  sublease      Sublease?    @relation(fields: [subleaseId], references: [id])
+  ejari         Ejari?       @relation(fields: [ejariId], references: [id])
+  subtenant     Subtenant?   @relation(fields: [subtenantId], references: [id])
+
+  @@map("documents")
+}
+
+// ============================================
+// AUDIT LOG
+// ============================================
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  userId     String?
+  action     String   // CREATE, UPDATE, DELETE, ARCHIVE, RESTORE
+  entityType String
+  entityId   String
+  changes    String?  // JSON string of changes
+  ipAddress  String?
+  userAgent  String?
+  createdAt  DateTime @default(now())
+
+  user       User?    @relation(fields: [userId], references: [id])
+
+  @@map("audit_logs")
+}
+
+// ============================================
+// NOTIFICATION
+// ============================================
+
+enum NotificationType {
+  LEASE_EXPIRY
+  EJARI_EXPIRY
+  TRADE_LICENSE_EXPIRY
+  INSURANCE_EXPIRY
+  RENT_OVERDUE
+  PAYMENT_RECEIVED
+  LEASE_RENEWAL
+  SYSTEM
+}
+
+model Notification {
+  id          String           @id @default(cuid())
+  type        NotificationType
+  title       String
+  message     String
+  isRead      Boolean          @default(false)
+  userId      String?
+  entityType  String?
+  entityId    String?
+  createdAt   DateTime         @default(now())
+  readAt      DateTime?
+
+  @@map("notifications")
+}

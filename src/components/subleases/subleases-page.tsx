@@ -40,12 +40,14 @@ export function SubleasesPage() {
       api={subleasesApi}
       searchPlaceholder="Search subleases..."
       columns={[
-        { key: 'subleaseNumber', label: 'Sublease #', render: (v: any) => <span className="font-mono font-medium">{v}</span> },
-        { key: 'unit', label: 'Unit', render: (_: any, row: any) => row.unit?.unitNumber || '-' },
+        { key: 'subleaseNumber', label: 'Contract #', render: (v: any) => <span className="font-mono font-medium">{v}</span> },
+        { key: 'mainLease', label: 'Main Lease', render: (_: any, row: any) => row.mainLease?.contractNo || row.mainLease?.leaseNumber || '-' },
+        { key: 'property', label: 'Property', render: (_: any, row: any) => row.mainLease?.property?.name || '-' },
         { key: 'subtenant', label: 'Subtenant', render: (_: any, row: any) => row.subtenant?.name || '-' },
-        { key: 'startDate', label: 'Start', render: (v: any) => formatDate(v) },
-        { key: 'endDate', label: 'End', render: (v: any) => formatDate(v) },
-        { key: 'rentAmount', label: 'Rent', render: (v: any) => formatCurrency(v) },
+        { key: 'unit', label: 'Unit', render: (_: any, row: any) => row.unit?.unitNumber || '-' },
+        { key: 'endDate', label: 'Expires On', render: (v: any) => formatDate(v) },
+        { key: 'contractValue', label: 'Contract Value', render: (v: any) => formatCurrency(v) },
+        { key: 'subLeaseFee', label: 'Sub-Lease Fee', render: (v: any) => formatCurrency(v) },
         { key: 'status', label: 'Status', render: (v: any) => <StatusBadge status={v} map={LEASE_STATUS_MAP} /> },
       ]}
       filterOptions={[
@@ -68,7 +70,7 @@ export function SubleasesPage() {
             <Select value={data.mainLeaseId || ''} onValueChange={v => setData({...data, mainLeaseId: v})}>
               <SelectTrigger><SelectValue placeholder="Select main lease" /></SelectTrigger>
               <SelectContent>
-                {mainLeases.map(l => <SelectItem key={l.id} value={l.id}>{l.leaseNumber}</SelectItem>)}
+                {mainLeases.map(l => <SelectItem key={l.id} value={l.id}>{l.contractNo} - {l.leaseNumber}</SelectItem>)}
               </SelectContent>
             </Select>
           </FormField>
@@ -87,6 +89,12 @@ export function SubleasesPage() {
                 {subtenants.map(s => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}
               </SelectContent>
             </Select>
+          </FormField>
+          <FormField label="Contract Value (AED)">
+            <Input type="number" value={data.contractValue || ''} onChange={e => setData({...data, contractValue: parseFloat(e.target.value) || 0})} />
+          </FormField>
+          <FormField label="Sub-Lease Fee (AED)">
+            <Input type="number" value={data.subLeaseFee || ''} onChange={e => setData({...data, subLeaseFee: parseFloat(e.target.value) || 0})} />
           </FormField>
           <FormField label="Rent Frequency">
             <Select value={data.rentFrequency || 'monthly'} onValueChange={v => setData({...data, rentFrequency: v})}>
@@ -132,7 +140,14 @@ export function SubleasesPage() {
           </FormField>
         </div>
       )}
-      defaultData={() => ({ subleaseNumber: '', status: 'DRAFT', rentFrequency: 'monthly', isActive: true })}
+      defaultData={() => ({
+        subleaseNumber: '',
+        status: 'DRAFT',
+        rentFrequency: 'monthly',
+        contractValue: 0,
+        subLeaseFee: 0,
+        isActive: true,
+      })}
     />
   )
 }

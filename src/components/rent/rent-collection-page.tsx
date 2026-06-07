@@ -299,7 +299,7 @@ export function RentCollectionPage() {
               <Select value={invoiceData.subleaseId || ''} onValueChange={v => setInvoiceData({...invoiceData, subleaseId: v})}>
                 <SelectTrigger><SelectValue placeholder="Select sublease" /></SelectTrigger>
                 <SelectContent>
-                  {subleases.map(s => <SelectItem key={s.id} value={s.id}>{s.subleaseNumber} - {s.subtenant?.name || s.subtenantName}</SelectItem>)}
+                  {subleases.map(s => <SelectItem key={s.id} value={s.id}>{s.subleaseNumber} - {s.subtenant?.name || s.subtenantName || ''}</SelectItem>)}
                 </SelectContent>
               </Select>
             </FormField>

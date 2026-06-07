@@ -20,12 +20,21 @@ export async function GET(request: NextRequest) {
     };
 
     if (search) {
-      where.OR = [
+      const orConditions: Record<string, unknown>[] = [
         { leaseNumber: { contains: search } },
         { landlordName: { contains: search } },
         { landlordEmail: { contains: search } },
+        { tenantNumber: { contains: search } },
+        { landNumber: { contains: search } },
+        { location: { contains: search } },
         { notes: { contains: search } },
       ];
+      // Search contractNo as number if search is numeric
+      const searchAsNum = parseInt(search);
+      if (!isNaN(searchAsNum)) {
+        orConditions.push({ contractNo: searchAsNum });
+      }
+      where.OR = orConditions;
     }
 
     if (status) {
@@ -51,7 +60,7 @@ export async function GET(request: NextRequest) {
         orderBy,
         include: {
           property: {
-            select: { id: true, name: true, propertyCode: true },
+            select: { id: true, name: true, propertyCode: true, plotNumber: true, area: true, totalArea: true },
           },
           company: {
             select: { id: true, name: true },
@@ -82,6 +91,7 @@ export async function POST(request: NextRequest) {
 
     const lease = await db.mainLease.create({
       data: {
+        contractNo: body.contractNo,
         leaseNumber: body.leaseNumber,
         startDate: new Date(body.startDate),
         endDate: new Date(body.endDate),
@@ -93,6 +103,10 @@ export async function POST(request: NextRequest) {
         landlordName: body.landlordName,
         landlordContact: body.landlordContact,
         landlordEmail: body.landlordEmail,
+        tenantNumber: body.tenantNumber,
+        landNumber: body.landNumber,
+        annualRentPerSqFt: body.annualRentPerSqFt,
+        location: body.location,
         terms: body.terms,
         notes: body.notes,
         status: body.status || 'DRAFT',
@@ -104,7 +118,7 @@ export async function POST(request: NextRequest) {
       },
       include: {
         property: {
-          select: { id: true, name: true, propertyCode: true },
+          select: { id: true, name: true, propertyCode: true, plotNumber: true, area: true, totalArea: true },
         },
         company: {
           select: { id: true, name: true },
@@ -118,7 +132,7 @@ export async function POST(request: NextRequest) {
     const errMsg = error instanceof Error ? error.message : 'Internal server error';
     if (errMsg.includes('Unique')) {
       return NextResponse.json(
-        { error: 'Lease number already exists' },
+        { error: 'Lease number or contract number already exists' },
         { status: 409 }
       );
     }
@@ -161,7 +175,7 @@ export async function PUT(request: NextRequest) {
       data,
       include: {
         property: {
-          select: { id: true, name: true, propertyCode: true },
+          select: { id: true, name: true, propertyCode: true, plotNumber: true, area: true, totalArea: true },
         },
         company: {
           select: { id: true, name: true },
@@ -175,7 +189,7 @@ export async function PUT(request: NextRequest) {
     const errMsg = error instanceof Error ? error.message : 'Internal server error';
     if (errMsg.includes('Unique')) {
       return NextResponse.json(
-        { error: 'Lease number already exists' },
+        { error: 'Lease number or contract number already exists' },
         { status: 409 }
       );
     }

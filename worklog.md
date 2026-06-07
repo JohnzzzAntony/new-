@@ -1,26 +1,34 @@
+# DREC PMS Worklog
+
 ---
-Task ID: 7
+Task ID: 1
 Agent: Main Agent
-Task: Fix site loading issues and data mapping bugs
+Task: Replace seed data with DREC MAIN & SUB LEASE DETAILS.xlsx data and integrate into the website
 
 Work Log:
-- Diagnosed that the Next.js dev server was not running and needed to be started persistently
-- Re-seeded the database with `bun prisma/seed.ts`
-- Started the dev server with `setsid` and `< /dev/null` to ensure it persists across shell sessions
-- Fixed formatDate function in module-page.tsx - was referencing undefined `format` from date-fns, replaced with manual date formatting
-- Fixed Properties page column mappings: `companyName` → `row.company?.name`, `_count` → `unitCount`
-- Fixed Units page column mapping: `propertyName` → `row.property?.name`
-- Fixed Main Leases page columns: `propertyName` → `row.property?.name`, `companyName` → `row.company?.name`
-- Fixed Subleases page columns: `unitNumber` → `row.unit?.unitNumber`, `subtenantName` → `row.subtenant?.name`
-- Fixed EJARI page columns: `subleaseNumber` → `row.sublease?.subleaseNumber`, `subtenantName` → `row.subtenant?.name`
-- Fixed Rent Collection page: receipt invoice number reference and sublease dropdown reference
-- Removed unused Dialog import from compliance-page.tsx that was importing from alert-dialog
-- Verified all 11 module pages display correct data through browser testing
-- Lint passes with 0 errors (1 warning about TanStack Table compatibility)
+- Read and analyzed the Excel file with 2 sheets: DREC MAIN (41 rows) and DREC SUB (176 rows)
+- Updated Prisma schema to add new fields: contractNo, tenantNumber, landNumber, annualRentPerSqFt, location on MainLease; contractValue, subLeaseFee on Sublease
+- Created comprehensive seed.ts with all Excel data properly mapped to database models
+- Companies extracted from "Main tenant / Us" column (10 companies)
+- Properties created from each DREC MAIN row with plot numbers and locations
+- Main Leases created with all fields from Excel including contract numbers, tenant numbers, land numbers
+- Subtenants extracted from unique subtenant names in DREC SUB (161 unique subtenants)
+- Subleases created with contract values and sub-lease fees from Excel
+- EJARI registrations created from ejari numbers in DREC SUB
+- Compliance alerts auto-generated for expiring leases
+- Updated main-leases API route to include new fields in search, create, and update operations
+- Updated subleases API route to include contractValue and subLeaseFee
+- Updated Main Leases frontend page with columns: Contract #, Property Name, Company, Plot No, Location, Lease Start/End, Annual Rent, Area Sq.Ft, Rent/Sq.Ft, Status
+- Updated Subleases frontend page with columns: Contract #, Main Lease, Property, Subtenant, Unit, Expires On, Contract Value, Sub-Lease Fee, Status
+- Updated dashboard API to calculate revenue from sublease contract values instead of invoices
+- Updated dashboard KPI labels: "Contract Value (Active)" and "Expired Contracts"
+- Fixed rent-collection-page.tsx syntax error
+- Database seeded successfully: 41 main leases, 172 subleases, 161 subtenants, 10 companies, 41 properties, 172 units, 172 EJARI registrations, 10 compliance alerts
+- Browser verified: Dashboard shows AED 43,137,626.45 contract value, all data properly aligned and displayed
 
 Stage Summary:
-- Site now loads correctly through Caddy proxy on port 81
-- All data mapping issues fixed - relational data (company names, property names, subtenant names, etc.) now displays correctly
-- Date formatting fixed - all dates now show as "DD Mon YYYY" format instead of raw ISO strings
-- Dev server running persistently on port 3000
-- All 11 modules verified working: Dashboard, Companies, Properties, Units, Main Leases, Subtenants, Subleases, EJARI, Rent Collection, Compliance, Reports
+- All Excel data from DREC MAIN & SUB LEASE DETAILS.xlsx has been integrated into the website
+- Data is properly aligned with Contract No, Plot No, Location, Annual Rent, Area, Rent/Sq.Ft for main leases
+- Sublease data shows Contract #, Property, Subtenant, Contract Value, Sub-Lease Fee correctly
+- Dashboard KPIs reflect real data from the Excel file
+- Site verified working via browser - all pages load correctly with data

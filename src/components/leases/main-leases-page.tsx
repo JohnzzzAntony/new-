@@ -39,12 +39,16 @@ export function MainLeasesPage() {
       api={mainLeasesApi}
       searchPlaceholder="Search main leases..."
       columns={[
-        { key: 'leaseNumber', label: 'Lease #', render: (v: any) => <span className="font-mono font-medium">{v}</span> },
+        { key: 'contractNo', label: 'Contract #', render: (v: any) => <span className="font-mono font-medium">{v}</span> },
         { key: 'property', label: 'Property', render: (_: any, row: any) => row.property?.name || '-' },
         { key: 'company', label: 'Company', render: (_: any, row: any) => row.company?.name || '-' },
-        { key: 'startDate', label: 'Start', render: (v: any) => formatDate(v) },
-        { key: 'endDate', label: 'End', render: (v: any) => formatDate(v) },
-        { key: 'rentAmount', label: 'Rent', render: (v: any) => formatCurrency(v) },
+        { key: 'plotNumber', label: 'Plot No', render: (_: any, row: any) => row.property?.plotNumber || '-' },
+        { key: 'location', label: 'Location', render: (v: any) => v || '-' },
+        { key: 'startDate', label: 'Lease Start', render: (v: any) => formatDate(v) },
+        { key: 'endDate', label: 'Lease End', render: (v: any) => formatDate(v) },
+        { key: 'rentAmount', label: 'Annual Rent', render: (v: any) => formatCurrency(v) },
+        { key: 'totalArea', label: 'Area Sq.Ft', render: (_: any, row: any) => row.property?.totalArea ? row.property.totalArea.toLocaleString() : '-' },
+        { key: 'annualRentPerSqFt', label: 'Rent/Sq.Ft', render: (v: any) => v ? formatCurrency(v) : '-' },
         { key: 'status', label: 'Status', render: (v: any) => <StatusBadge status={v} map={LEASE_STATUS_MAP} /> },
       ]}
       filterOptions={[
@@ -52,6 +56,9 @@ export function MainLeasesPage() {
       ]}
       renderForm={(data, setData) => (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <FormField label="Contract No">
+            <Input type="number" value={data.contractNo || ''} onChange={e => setData({...data, contractNo: parseInt(e.target.value) || 0})} placeholder="DREC Contract #" />
+          </FormField>
           <FormField label="Lease Number">
             <Input value={data.leaseNumber || ''} onChange={e => setData({...data, leaseNumber: e.target.value})} placeholder="ML-YYYY-NNN" />
           </FormField>
@@ -79,6 +86,15 @@ export function MainLeasesPage() {
               </SelectContent>
             </Select>
           </FormField>
+          <FormField label="Tenant Number">
+            <Input value={data.tenantNumber || ''} onChange={e => setData({...data, tenantNumber: e.target.value})} placeholder="DREC Tenant #" />
+          </FormField>
+          <FormField label="Land Number">
+            <Input value={data.landNumber || ''} onChange={e => setData({...data, landNumber: e.target.value})} placeholder="DREC Land #" />
+          </FormField>
+          <FormField label="Location">
+            <Input value={data.location || ''} onChange={e => setData({...data, location: e.target.value})} placeholder="Location area" />
+          </FormField>
           <FormField label="Start Date">
             <Input type="date" value={data.startDate ? data.startDate.split('T')[0] : ''} onChange={e => setData({...data, startDate: e.target.value})} />
           </FormField>
@@ -87,6 +103,9 @@ export function MainLeasesPage() {
           </FormField>
           <FormField label="Rent Amount (AED)">
             <Input type="number" value={data.rentAmount || ''} onChange={e => setData({...data, rentAmount: parseFloat(e.target.value) || 0})} />
+          </FormField>
+          <FormField label="Annual Rent/Sq.Ft (AED)">
+            <Input type="number" value={data.annualRentPerSqFt || ''} onChange={e => setData({...data, annualRentPerSqFt: parseFloat(e.target.value) || undefined})} />
           </FormField>
           <FormField label="Rent Frequency">
             <Select value={data.rentFrequency || 'annual'} onValueChange={v => setData({...data, rentFrequency: v})}>
@@ -132,7 +151,18 @@ export function MainLeasesPage() {
           </FormField>
         </div>
       )}
-      defaultData={() => ({ leaseNumber: '', status: 'DRAFT', rentFrequency: 'annual', landlordName: 'DREC Properties', isActive: true })}
+      defaultData={() => ({
+        contractNo: 0,
+        leaseNumber: '',
+        status: 'DRAFT',
+        rentFrequency: 'annual',
+        landlordName: 'DREC Properties',
+        tenantNumber: '',
+        landNumber: '',
+        location: '',
+        annualRentPerSqFt: undefined,
+        isActive: true,
+      })}
     />
   )
 }

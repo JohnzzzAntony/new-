@@ -56,8 +56,8 @@ export function DashboardPage() {
     { label: 'Total Properties', value: kpis.totalProperties || 0, icon: Building, color: 'bg-emerald-50 text-emerald-600' },
     { label: 'Total Units', value: kpis.totalUnits || 0, icon: Box, color: 'bg-teal-50 text-teal-600' },
     { label: 'Occupancy Rate', value: `${kpis.occupancyRate || 0}%`, icon: Percent, color: 'bg-cyan-50 text-cyan-600' },
-    { label: 'Total Revenue', value: `AED ${((kpis.totalRevenue || 0)).toLocaleString()}`, icon: DollarSign, color: 'bg-amber-50 text-amber-600' },
-    { label: 'Outstanding', value: `AED ${((kpis.outstandingBalance || 0)).toLocaleString()}`, icon: AlertCircle, color: 'bg-red-50 text-red-600' },
+    { label: 'Contract Value (Active)', value: `AED ${((kpis.totalRevenue || 0)).toLocaleString()}`, icon: DollarSign, color: 'bg-amber-50 text-amber-600' },
+    { label: 'Expired Contracts', value: `AED ${((kpis.outstandingBalance || 0)).toLocaleString()}`, icon: AlertCircle, color: 'bg-red-50 text-red-600' },
     { label: 'Active Leases', value: kpis.activeLeases || 0, icon: FileText, color: 'bg-violet-50 text-violet-600' },
     { label: 'Active Subleases', value: kpis.activeSubleases || 0, icon: FileSignature, color: 'bg-pink-50 text-pink-600' },
     { label: 'Expiring Soon', value: kpis.expiringLeasesCount || 0, icon: Clock, color: 'bg-orange-50 text-orange-600' },
@@ -140,7 +140,7 @@ export function DashboardPage() {
 
         <Card className="border-0 shadow-sm">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-semibold">Monthly Revenue</CardTitle>
+            <CardTitle className="text-sm font-semibold">Sub-Lease Fee Revenue</CardTitle>
           </CardHeader>
           <CardContent>
             {(data.monthlyRevenue || []).length > 0 ? (

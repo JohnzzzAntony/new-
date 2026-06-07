@@ -54,13 +54,20 @@ export async function GET(request: NextRequest) {
         orderBy,
         include: {
           mainLease: {
-            select: { id: true, leaseNumber: true },
+            select: {
+              id: true,
+              leaseNumber: true,
+              contractNo: true,
+              property: {
+                select: { id: true, name: true },
+              },
+            },
           },
           unit: {
-            select: { id: true, unitNumber: true, unitType: true },
+            select: { id: true, unitNumber: true, unitType: true, area: true, rentAmount: true },
           },
           subtenant: {
-            select: { id: true, name: true, tradeName: true },
+            select: { id: true, name: true, tradeName: true, phone: true, email: true },
           },
         },
       }),
@@ -89,6 +96,8 @@ export async function POST(request: NextRequest) {
     const sublease = await db.sublease.create({
       data: {
         subleaseNumber: body.subleaseNumber,
+        contractValue: body.contractValue ?? 0,
+        subLeaseFee: body.subLeaseFee ?? 0,
         startDate: new Date(body.startDate),
         endDate: new Date(body.endDate),
         rentAmount: body.rentAmount,
@@ -108,13 +117,20 @@ export async function POST(request: NextRequest) {
       },
       include: {
         mainLease: {
-          select: { id: true, leaseNumber: true },
+          select: {
+            id: true,
+            leaseNumber: true,
+            contractNo: true,
+            property: {
+              select: { id: true, name: true },
+            },
+          },
         },
         unit: {
-          select: { id: true, unitNumber: true, unitType: true },
+          select: { id: true, unitNumber: true, unitType: true, area: true, rentAmount: true },
         },
         subtenant: {
-          select: { id: true, name: true, tradeName: true },
+          select: { id: true, name: true, tradeName: true, phone: true, email: true },
         },
       },
     });
@@ -168,13 +184,20 @@ export async function PUT(request: NextRequest) {
       data,
       include: {
         mainLease: {
-          select: { id: true, leaseNumber: true },
+          select: {
+            id: true,
+            leaseNumber: true,
+            contractNo: true,
+            property: {
+              select: { id: true, name: true },
+            },
+          },
         },
         unit: {
-          select: { id: true, unitNumber: true, unitType: true },
+          select: { id: true, unitNumber: true, unitType: true, area: true, rentAmount: true },
         },
         subtenant: {
-          select: { id: true, name: true, tradeName: true },
+          select: { id: true, name: true, tradeName: true, phone: true, email: true },
         },
       },
     });

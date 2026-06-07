@@ -199,6 +199,7 @@ enum LeaseRenewalStatus {
 
 model MainLease {
   id               String            @id @default(cuid())
+  contractNo       Int               @unique
   leaseNumber      String            @unique
   startDate        DateTime
   endDate          DateTime
@@ -210,6 +211,10 @@ model MainLease {
   landlordName     String
   landlordContact  String?
   landlordEmail    String?
+  tenantNumber     String?           // DREC tenant number
+  landNumber       String?           // DREC land number
+  annualRentPerSqFt Float?           // Annual rent per sq ft
+  location         String?           // Location area
   terms            String?           // JSON of terms
   notes            String?
   status           LeaseStatus       @default(DRAFT)
@@ -281,6 +286,8 @@ enum SubleaseStatus {
 model Sublease {
   id               String          @id @default(cuid())
   subleaseNumber   String          @unique
+  contractValue    Float           @default(0)
+  subLeaseFee      Float           @default(0)
   startDate        DateTime
   endDate          DateTime
   rentAmount       Float

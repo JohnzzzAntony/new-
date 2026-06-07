@@ -114,37 +114,24 @@ export async function GET() {
         _count: { status: true },
       }),
 
-      // Invoices for revenue calculation (paid in last 12 months)
-      db.invoice.findMany({
-        where: {
-          deletedAt: null,
-          isActive: true,
-          status: { in: ['PAID', 'PARTIALLY_PAID'] },
-          issueDate: { gte: thirtyDaysAgo },
-        },
-        select: {
-          totalAmount: true,
-          amountPaid: true,
-          balanceDue: true,
-          issueDate: true,
-        },
+      // Revenue from active sublease contract values (since no invoice data from Excel)
+      db.sublease.aggregate({
+        _sum: { contractValue: true, subLeaseFee: true },
+        where: { deletedAt: null, isActive: true, status: 'ACTIVE' },
       }),
 
-      // Outstanding invoices
-      db.invoice.aggregate({
-        _sum: { balanceDue: true },
-        where: {
-          deletedAt: null,
-          isActive: true,
-          status: { in: ['ISSUED', 'PARTIALLY_PAID', 'OVERDUE'] },
-        },
+      // Outstanding - sum of expired sublease contract values
+      db.sublease.aggregate({
+        _sum: { contractValue: true },
+        where: { deletedAt: null, isActive: true, status: 'EXPIRED' },
       }),
     ]);
 
     // Calculate KPI values
     const occupancyRate = totalUnits > 0 ? Math.round((occupiedUnits / totalUnits) * 100) : 0;
-    const totalRevenue = invoicesForRevenue.reduce((sum, inv) => sum + (inv.amountPaid || 0), 0);
-    const outstandingBalance = outstandingInvoices._sum.balanceDue || 0;
+    const totalRevenue = invoicesForRevenue._sum.contractValue || 0;
+    const subLeaseFeeTotal = invoicesForRevenue._sum.subLeaseFee || 0;
+    const outstandingBalance = outstandingInvoices._sum.contractValue || 0;
 
     // Process occupancy by property type
     const occupancyByTypeMap = new Map<string, { total: number; occupied: number }>();
@@ -169,18 +156,19 @@ export async function GET() {
       count: item._count.status,
     }));
 
-    // Monthly revenue data (last 12 months)
+    // Monthly revenue data - from sublease contract values by end date month
     const twelveMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 11, 1);
-    const monthlyInvoices = await db.invoice.findMany({
+    const monthlySubleases = await db.sublease.findMany({
       where: {
         deletedAt: null,
         isActive: true,
-        status: { in: ['PAID', 'PARTIALLY_PAID'] },
-        issueDate: { gte: twelveMonthsAgo },
+        status: 'ACTIVE',
+        endDate: { gte: twelveMonthsAgo },
       },
       select: {
-        amountPaid: true,
-        issueDate: true,
+        contractValue: true,
+        subLeaseFee: true,
+        endDate: true,
       },
     });
 
@@ -191,11 +179,11 @@ export async function GET() {
       monthlyRevenueMap.set(key, 0);
     }
 
-    for (const inv of monthlyInvoices) {
-      const date = new Date(inv.issueDate);
+    for (const sub of monthlySubleases) {
+      const date = new Date(sub.endDate);
       const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
       if (monthlyRevenueMap.has(key)) {
-        monthlyRevenueMap.set(key, (monthlyRevenueMap.get(key) || 0) + (inv.amountPaid || 0));
+        monthlyRevenueMap.set(key, (monthlyRevenueMap.get(key) || 0) + (sub.subLeaseFee || 0));
       }
     }
 

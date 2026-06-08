@@ -30,12 +30,18 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
-.env*
+# ============================================
+# SECRETS - NEVER commit these files!
+# ============================================
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env*.local
 
 # vercel
 .vercel
-
 
 # typescript
 *.tsbuildinfo
@@ -43,12 +49,42 @@ next-env.d.ts
 local-*
 .claude
 .z-ai-config
+
+# logs
 *.log
 dev.log
 dev.out.log
-test
-prompt
-
 server.log
+
+# Database
+*.db
+*.db-journal
+db/
+
 # Skills directory
 /skills/
+
+# Screenshots
+screenshot-*.png
+
+# Z scripts
+.zscripts/
+
+# Agent context
+agent-ctx/
+
+# Mini services
+mini-services/
+
+# Download folder
+download/
+
+# Upload folder
+upload/
+
+# Binary files
+*.deb
+gh
+
+# Push script (contains token patterns)
+push-to-github.sh

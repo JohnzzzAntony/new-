@@ -9,7 +9,7 @@ const prismaClientOptions = {
   log: process.env.NODE_ENV === 'production' ? ['warn', 'error'] : ['query'],
   datasources: {
     db: {
-      url: process.env.DATABASE_URL,
+      url: process.env.DATABASE_URL || "postgresql://dummy:dummy@localhost:5432/dummy",
     },
   },
 }

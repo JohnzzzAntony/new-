@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 
+export const dynamic = 'force-dynamic';
+
 function toCSV(headers: string[], rows: string[][]): string {
   const headerLine = headers.join(',');
   const dataLines = rows.map((row) =>

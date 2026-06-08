@@ -1,3 +1,6 @@
+import { config } from 'dotenv'
+config()
+
 import { PrismaClient, UserRole, PropertyType, UnitType, UnitStatus, LeaseStatus, SubleaseStatus, EjariStatus, InvoiceStatus, PaymentMethod, ComplianceType, ComplianceStatus, NotificationType, LeaseRenewalStatus } from '@prisma/client'
 import { hash } from 'bcryptjs'
 

@@ -32,3 +32,33 @@ Stage Summary:
 - Sublease data shows Contract #, Property, Subtenant, Contract Value, Sub-Lease Fee correctly
 - Dashboard KPIs reflect real data from the Excel file
 - Site verified working via browser - all pages load correctly with data
+
+---
+Task ID: 2
+Agent: Main Agent
+Task: Migrate from SQLite to PostgreSQL (Neon), configure for Railway deployment, protect secrets, push to GitHub
+
+Work Log:
+- Verified Prisma schema already uses PostgreSQL provider with directUrl for Neon
+- Updated src/lib/db.ts with explicit DATABASE_URL datasource configuration for Neon SSL support
+- Created .env.example with placeholder values (no real secrets)
+- Verified .env is gitignored and not tracked in git
+- Created Dockerfile for Railway deployment (multi-stage, includes prisma migrate deploy)
+- Updated package.json: build script = prisma generate && next build; start script = prisma migrate deploy && next start
+- Added dotenv to seed.ts for proper .env file loading
+- Generated initial Prisma migration (20260608215153_init_postgresql)
+- Applied migration to Neon PostgreSQL database
+- Seeded Neon PostgreSQL database with all DREC data (41 main leases, 172 subleases, etc.)
+- Verified dev server works with PostgreSQL - all API queries returning data from Neon
+- Verified no secrets (npg_*, ghp_*) in tracked files
+- Force pushed to GitHub (https://github.com/JohnzzzAntony/Jaber.git) with new PAT
+- Removed PAT from git remote URL after push
+
+Stage Summary:
+- Database migrated from SQLite to Neon PostgreSQL (serverless)
+- All data seeded successfully to Neon
+- Dev server verified working with PostgreSQL
+- .env.example created, .env gitignored - no secrets in repo
+- Dockerfile created for Railway deployment
+- Code pushed to GitHub repo
+- Railway deployment URL: https://jaber-production.up.railway.app/

@@ -73,6 +73,9 @@ screenshot-*.png
 # Agent context
 agent-ctx/
 
+# Worklog (may contain references to secrets)
+worklog.md
+
 # Mini services
 mini-services/
 
@@ -88,3 +91,4 @@ gh
 
 # Push script (contains token patterns)
 push-to-github.sh
+start-dev.sh

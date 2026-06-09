@@ -3,8 +3,9 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 // ============================================
@@ -44,7 +45,7 @@ model Company {
   id              String   @id @default(cuid())
   name            String
   tradeName       String?
-  registrationNo  String?
+  registrationNo  String?  @unique
   tradeLicenseNo  String?
   tradeLicenseExpiry DateTime?
   address         String?
@@ -334,7 +335,7 @@ enum EjariStatus {
 
 model Ejari {
   id                String      @id @default(cuid())
-  ejariNumber       String?
+  ejariNumber       String?     @unique
   registrationDate  DateTime?
   expiryDate        DateTime?
   certificateUrl    String?

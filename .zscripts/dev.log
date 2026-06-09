@@ -1,0 +1,252 @@
+==========================================
+[2026-06-10 21:59:07] Starting: bun install
+==========================================
+[BUN] Installing dependencies...
+[0.03ms] ".env"
+bun install v1.3.14 (0d9b296a)
+
+$ prisma generate
+warn The configuration property `package.json#prisma` is deprecated and will be removed in Prisma 7. Please migrate to a Prisma config file (e.g., `prisma.config.ts`).
+For more information, see: https://pris.ly/prisma-config
+
+Environment variables loaded from .env
+Prisma schema loaded from prisma/schema.prisma
+
+✔ Generated Prisma Client (v6.19.2) to ./node_modules/@prisma/client in 110ms
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+Tip: Interested in query caching in just a few lines of code? Try Accelerate today! https://pris.ly/tip-3-accelerate
+
+
++ eslint@9.39.2
++ eslint-config-next@16.1.3
++ typescript@5.9.3
++ @prisma/client@6.19.2
++ @radix-ui/react-aspect-ratio@1.1.8
++ @tanstack/react-query@5.90.19
++ lucide-react@0.525.0
++ next@16.1.3
++ prisma@6.19.2
++ react-dom@19.2.3
++ react-hook-form@7.71.1
+
+292 packages installed [440.72s]
+==========================================
+[2026-06-10 22:06:28] Completed: bun install
+[LOG] Step: bun install | Duration: 441s
+==========================================
+
+==========================================
+[2026-06-10 22:06:28] Starting: bun run db:push
+==========================================
+[BUN] Setting up database...
+$ prisma db push
+warn The configuration property `package.json#prisma` is deprecated and will be removed in Prisma 7. Please migrate to a Prisma config file (e.g., `prisma.config.ts`).
+For more information, see: https://pris.ly/prisma-config
+
+Environment variables loaded from .env
+Prisma schema loaded from prisma/schema.prisma
+Error: Prisma schema validation - (get-config wasm)
+Error code: P1012
+error: Environment variable not found: DIRECT_URL.
+  -->  prisma/schema.prisma:8
+   | 
+ 7 |   url      = env("DATABASE_URL")
+ 8 |   directUrl = env("DIRECT_URL")
+   | 
+
+Validation Error Count: 1
+[Context: getConfig]
+
+Prisma CLI Version : 6.19.2
+error: script "db:push" exited with code 1
+==========================================
+[2026-06-12 09:02:02] Starting: bun install
+==========================================
+[BUN] Installing dependencies...
+[0.02ms] ".env"
+bun install v1.3.14 (0d9b296a)
+
+$ prisma generate
+warn The configuration property `package.json#prisma` is deprecated and will be removed in Prisma 7. Please migrate to a Prisma config file (e.g., `prisma.config.ts`).
+For more information, see: https://pris.ly/prisma-config
+
+Environment variables loaded from .env
+Prisma schema loaded from prisma/schema.prisma
+
+✔ Generated Prisma Client (v6.19.2) to ./node_modules/@prisma/client in 121ms
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+Tip: Interested in query caching in just a few lines of code? Try Accelerate today! https://pris.ly/tip-3-accelerate
+
+
+Checked 850 installs across 918 packages (no changes) [934.00ms]
+==========================================
+[2026-06-12 09:02:03] Completed: bun install
+[LOG] Step: bun install | Duration: 1s
+==========================================
+
+==========================================
+[2026-06-12 09:02:03] Starting: bun run db:push
+==========================================
+[BUN] Setting up database...
+$ prisma db push
+warn The configuration property `package.json#prisma` is deprecated and will be removed in Prisma 7. Please migrate to a Prisma config file (e.g., `prisma.config.ts`).
+For more information, see: https://pris.ly/prisma-config
+
+Environment variables loaded from .env
+Prisma schema loaded from prisma/schema.prisma
+Datasource "db": SQLite database "custom.db" at "file:/home/z/my-project/db/custom.db"
+
+The database is already in sync with the Prisma schema.
+
+Running generate... (Use --skip-generate to skip the generators)
+[2K[1A[2K[GRunning generate... - Prisma Client
+[2K[1A[2K[G✔ Generated Prisma Client (v6.19.2) to ./node_modules/@prisma/client in 114ms
+
+==========================================
+[2026-06-12 09:02:04] Completed: bun run db:push
+[LOG] Step: bun run db:push | Duration: 1s
+==========================================
+
+==========================================
+[2026-06-12 09:02:04] Starting: Starting Next.js dev server
+==========================================
+[BUN] Starting development server...
+==========================================
+$ next dev -p 3000
+[2026-06-12 09:02:04] Completed: Starting Next.js dev server
+[LOG] Step: Starting Next.js dev server | Duration: 0s
+==========================================
+
+==========================================
+[2026-06-12 09:02:04] Starting: Waiting for Next.js dev server
+==========================================
+Waiting for Next.js dev server to be ready on localhost:3000...
+Attempt 1/60: Next.js dev server not ready yet, waiting...
+▲ Next.js 16.1.3 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://21.0.21.176:3000
+- Environments: .env
+
+✓ Starting...
+Attention: Next.js now collects completely anonymous telemetry regarding usage.
+This information is used to shape Next.js' roadmap and prioritize features.
+You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+https://nextjs.org/telemetry
+
+✓ Ready in 555ms
+○ Compiling / ...
+Next.js dev server is ready!
+ GET / 200 in 4.3s (compile: 4.1s, render: 204ms)
+==========================================
+[2026-06-12 09:02:10] Completed: Waiting for Next.js dev server
+[LOG] Step: Waiting for Next.js dev server | Duration: 6s
+==========================================
+
+==========================================
+[2026-06-12 09:02:10] Starting: Health check
+==========================================
+[BUN] Performing health check...
+ GET / 200 in 1503ms (compile: 1465ms, render: 38ms)
+ GET / 200 in 19ms (compile: 1632µs, render: 17ms)
+[BUN] Health check passed
+==========================================
+[2026-06-12 09:02:10] Completed: Health check
+[LOG] Step: Health check | Duration: 0s
+==========================================
+
+==========================================
+[2026-06-12 09:02:10] Starting: Starting mini-services
+==========================================
+Found mini-services directory, scanning for sub-services...
+Mini-services startup completed. Started 0 service(s).
+==========================================
+[2026-06-12 09:02:10] Completed: Starting mini-services
+[LOG] Step: Starting mini-services | Duration: 0s
+==========================================
+
+Next.js dev server is running in background (PID: 1105).
+Use 'kill 1105' to stop it.
+ GET / 200 in 23ms (compile: 2ms, render: 21ms)
+prisma:query SELECT COUNT(*) AS `_count$_all` FROM (SELECT `main`.`main_leases`.`id` FROM `main`.`main_leases` WHERE (`main`.`main_leases`.`deletedAt` IS NULL AND `main`.`main_leases`.`isActive` = ? AND `main`.`main_leases`.`status` = ?) LIMIT ? OFFSET ?) AS `sub`
+prisma:query SELECT COUNT(*) AS `_count$_all` FROM (SELECT `main`.`properties`.`id` FROM `main`.`properties` WHERE (`main`.`properties`.`deletedAt` IS NULL AND `main`.`properties`.`isActive` = ?) LIMIT ? OFFSET ?) AS `sub`
+prisma:query SELECT COUNT(*) AS `_count$_all` FROM (SELECT `main`.`units`.`id` FROM `main`.`units` WHERE (`main`.`units`.`deletedAt` IS NULL AND `main`.`units`.`isActive` = ?) LIMIT ? OFFSET ?) AS `sub`
+prisma:query SELECT COUNT(*) AS `_count$_all` FROM (SELECT `main`.`units`.`id` FROM `main`.`units` WHERE (`main`.`units`.`deletedAt` IS NULL AND `main`.`units`.`isActive` = ? AND `main`.`units`.`status` = ?) LIMIT ? OFFSET ?) AS `sub`
+prisma:query SELECT COUNT(*) AS `_count$_all` FROM (SELECT `main`.`subleases`.`id` FROM `main`.`subleases` WHERE (`main`.`subleases`.`deletedAt` IS NULL AND `main`.`subleases`.`isActive` = ? AND `main`.`subleases`.`status` = ?) LIMIT ? OFFSET ?) AS `sub`
+prisma:query SELECT `main`.`ejari_registrations`.`id`, `main`.`ejari_registrations`.`ejariNumber`, `main`.`ejari_registrations`.`registrationDate`, `main`.`ejari_registrations`.`expiryDate`, `main`.`ejari_registrations`.`certificateUrl`, `main`.`ejari_registrations`.`status`, `main`.`ejari_registrations`.`notes`, `main`.`ejari_registrations`.`subleaseId`, `main`.`ejari_registrations`.`subtenantId`, `main`.`ejari_registrations`.`isActive`, `main`.`ejari_registrations`.`createdAt`, `main`.`ejari_registrations`.`updatedAt`, `main`.`ejari_registrations`.`deletedAt` FROM `main`.`ejari_registrations` WHERE (`main`.`ejari_registrations`.`deletedAt` IS NULL AND `main`.`ejari_registrations`.`isActive` = ? AND `main`.`ejari_registrations`.`status` IN (?,?) AND `main`.`ejari_registrations`.`expiryDate` <= ? AND `main`.`ejari_registrations`.`expiryDate` >= ?) ORDER BY `main`.`ejari_registrations`.`expiryDate` ASC LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`properties`.`id`, `main`.`properties`.`propertyType` FROM `main`.`properties` WHERE (`main`.`properties`.`deletedAt` IS NULL AND `main`.`properties`.`isActive` = ?) LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`subleases`.`id`, `main`.`subleases`.`subleaseNumber` FROM `main`.`subleases` WHERE `main`.`subleases`.`id` IN (?,?,?,?,?,?,?,?,?,?) LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`subtenants`.`id`, `main`.`subtenants`.`name`, `main`.`subtenants`.`tradeName` FROM `main`.`subtenants` WHERE `main`.`subtenants`.`id` IN (?,?,?,?,?,?,?,?,?,?) LIMIT ? OFFSET ?
+prisma:query SELECT SUM(`rentAmount`) AS `_sum$rentAmount` FROM (SELECT `main`.`units`.`rentAmount` FROM `main`.`units` WHERE (`main`.`units`.`deletedAt` IS NULL AND `main`.`units`.`isActive` = ? AND `main`.`units`.`rentAmount` IS NOT NULL) LIMIT ? OFFSET ?) AS `sub`
+prisma:query SELECT `main`.`units`.`id`, `main`.`units`.`status`, `main`.`units`.`propertyId` FROM `main`.`units` WHERE ((`main`.`units`.`deletedAt` IS NULL AND `main`.`units`.`isActive` = ?) AND `main`.`units`.`propertyId` IN (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)) LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`main_leases`.`id`, `main`.`main_leases`.`contractNo`, `main`.`main_leases`.`leaseNumber`, `main`.`main_leases`.`startDate`, `main`.`main_leases`.`endDate`, `main`.`main_leases`.`rentAmount`, `main`.`main_leases`.`rentFrequency`, `main`.`main_leases`.`securityDeposit`, `main`.`main_leases`.`incrementPercent`, `main`.`main_leases`.`incrementFrequency`, `main`.`main_leases`.`landlordName`, `main`.`main_leases`.`landlordContact`, `main`.`main_leases`.`landlordEmail`, `main`.`main_leases`.`tenantNumber`, `main`.`main_leases`.`landNumber`, `main`.`main_leases`.`annualRentPerSqFt`, `main`.`main_leases`.`location`, `main`.`main_leases`.`terms`, `main`.`main_leases`.`notes`, `main`.`main_leases`.`status`, `main`.`main_leases`.`renewalStatus`, `main`.`main_leases`.`renewedFromId`, `main`.`main_leases`.`propertyId`, `main`.`main_leases`.`companyId`, `main`.`main_leases`.`isActive`, `main`.`main_leases`.`createdAt`, `main`.`main_leases`.`updatedAt`, `main`.`main_leases`.`deletedAt` FROM `main`.`main_leases` WHERE (`main`.`main_leases`.`deletedAt` IS NULL AND `main`.`main_leases`.`isActive` = ? AND `main`.`main_leases`.`status` = ? AND `main`.`main_leases`.`endDate` <= ? AND `main`.`main_leases`.`endDate` >= ?) ORDER BY `main`.`main_leases`.`endDate` ASC LIMIT ? OFFSET ?
+prisma:query SELECT SUM(`contractValue`) AS `_sum$contractValue`, SUM(`subLeaseFee`) AS `_sum$subLeaseFee` FROM (SELECT `main`.`subleases`.`contractValue`, `main`.`subleases`.`subLeaseFee` FROM `main`.`subleases` WHERE (`main`.`subleases`.`deletedAt` IS NULL AND `main`.`subleases`.`isActive` = ? AND `main`.`subleases`.`status` = ?) LIMIT ? OFFSET ?) AS `sub`
+prisma:query SELECT `main`.`properties`.`id`, `main`.`properties`.`name` FROM `main`.`properties` WHERE `main`.`properties`.`id` IN (?,?,?,?,?,?,?,?,?,?) LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`compliance_alerts`.`id`, `main`.`compliance_alerts`.`type`, `main`.`compliance_alerts`.`title`, `main`.`compliance_alerts`.`description`, `main`.`compliance_alerts`.`entityType`, `main`.`compliance_alerts`.`entityId`, `main`.`compliance_alerts`.`expiryDate`, `main`.`compliance_alerts`.`daysUntilExpiry`, `main`.`compliance_alerts`.`status`, `main`.`compliance_alerts`.`isNotified`, `main`.`compliance_alerts`.`notifiedAt`, `main`.`compliance_alerts`.`resolvedAt`, `main`.`compliance_alerts`.`notes`, `main`.`compliance_alerts`.`createdAt`, `main`.`compliance_alerts`.`updatedAt` FROM `main`.`compliance_alerts` WHERE `main`.`compliance_alerts`.`status` IN (?,?,?) ORDER BY `main`.`compliance_alerts`.`createdAt` DESC LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`companies`.`id`, `main`.`companies`.`name` FROM `main`.`companies` WHERE `main`.`companies`.`id` IN (?,?,?,?,?) LIMIT ? OFFSET ?
+prisma:query SELECT SUM(`contractValue`) AS `_sum$contractValue` FROM (SELECT `main`.`subleases`.`contractValue` FROM `main`.`subleases` WHERE (`main`.`subleases`.`deletedAt` IS NULL AND `main`.`subleases`.`isActive` = ? AND `main`.`subleases`.`status` = ?) LIMIT ? OFFSET ?) AS `sub`
+prisma:query SELECT COUNT(`main`.`units`.`status`) AS `_count$status`, `main`.`units`.`status` FROM `main`.`units` WHERE (`main`.`units`.`deletedAt` IS NULL AND `main`.`units`.`isActive` = ?) GROUP BY `main`.`units`.`status` LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`subleases`.`id`, `main`.`subleases`.`contractValue`, `main`.`subleases`.`subLeaseFee`, `main`.`subleases`.`endDate` FROM `main`.`subleases` WHERE (`main`.`subleases`.`deletedAt` IS NULL AND `main`.`subleases`.`isActive` = ? AND `main`.`subleases`.`status` = ? AND `main`.`subleases`.`endDate` >= ?) LIMIT ? OFFSET ?
+ GET /api/dashboard 200 in 337ms (compile: 290ms, render: 47ms)
+prisma:query SELECT COUNT(*) AS `_count$_all` FROM (SELECT `main`.`properties`.`id` FROM `main`.`properties` WHERE (`main`.`properties`.`deletedAt` IS NULL AND `main`.`properties`.`isActive` = ?) LIMIT ? OFFSET ?) AS `sub`
+prisma:query SELECT COUNT(*) AS `_count$_all` FROM (SELECT `main`.`units`.`id` FROM `main`.`units` WHERE (`main`.`units`.`deletedAt` IS NULL AND `main`.`units`.`isActive` = ?) LIMIT ? OFFSET ?) AS `sub`
+prisma:query SELECT COUNT(*) AS `_count$_all` FROM (SELECT `main`.`units`.`id` FROM `main`.`units` WHERE (`main`.`units`.`deletedAt` IS NULL AND `main`.`units`.`isActive` = ? AND `main`.`units`.`status` = ?) LIMIT ? OFFSET ?) AS `sub`
+prisma:query SELECT SUM(`rentAmount`) AS `_sum$rentAmount` FROM (SELECT `main`.`units`.`rentAmount` FROM `main`.`units` WHERE (`main`.`units`.`deletedAt` IS NULL AND `main`.`units`.`isActive` = ? AND `main`.`units`.`rentAmount` IS NOT NULL) LIMIT ? OFFSET ?) AS `sub`
+prisma:query SELECT COUNT(*) AS `_count$_all` FROM (SELECT `main`.`main_leases`.`id` FROM `main`.`main_leases` WHERE (`main`.`main_leases`.`deletedAt` IS NULL AND `main`.`main_leases`.`isActive` = ? AND `main`.`main_leases`.`status` = ?) LIMIT ? OFFSET ?) AS `sub`
+prisma:query SELECT `main`.`compliance_alerts`.`id`, `main`.`compliance_alerts`.`type`, `main`.`compliance_alerts`.`title`, `main`.`compliance_alerts`.`description`, `main`.`compliance_alerts`.`entityType`, `main`.`compliance_alerts`.`entityId`, `main`.`compliance_alerts`.`expiryDate`, `main`.`compliance_alerts`.`daysUntilExpiry`, `main`.`compliance_alerts`.`status`, `main`.`compliance_alerts`.`isNotified`, `main`.`compliance_alerts`.`notifiedAt`, `main`.`compliance_alerts`.`resolvedAt`, `main`.`compliance_alerts`.`notes`, `main`.`compliance_alerts`.`createdAt`, `main`.`compliance_alerts`.`updatedAt` FROM `main`.`compliance_alerts` WHERE `main`.`compliance_alerts`.`status` IN (?,?,?) ORDER BY `main`.`compliance_alerts`.`createdAt` DESC LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`main_leases`.`id`, `main`.`main_leases`.`contractNo`, `main`.`main_leases`.`leaseNumber`, `main`.`main_leases`.`startDate`, `main`.`main_leases`.`endDate`, `main`.`main_leases`.`rentAmount`, `main`.`main_leases`.`rentFrequency`, `main`.`main_leases`.`securityDeposit`, `main`.`main_leases`.`incrementPercent`, `main`.`main_leases`.`incrementFrequency`, `main`.`main_leases`.`landlordName`, `main`.`main_leases`.`landlordContact`, `main`.`main_leases`.`landlordEmail`, `main`.`main_leases`.`tenantNumber`, `main`.`main_leases`.`landNumber`, `main`.`main_leases`.`annualRentPerSqFt`, `main`.`main_leases`.`location`, `main`.`main_leases`.`terms`, `main`.`main_leases`.`notes`, `main`.`main_leases`.`status`, `main`.`main_leases`.`renewalStatus`, `main`.`main_leases`.`renewedFromId`, `main`.`main_leases`.`propertyId`, `main`.`main_leases`.`companyId`, `main`.`main_leases`.`isActive`, `main`.`main_leases`.`createdAt`, `main`.`main_leases`.`updatedAt`, `main`.`main_leases`.`deletedAt` FROM `main`.`main_leases` WHERE (`main`.`main_leases`.`deletedAt` IS NULL AND `main`.`main_leases`.`isActive` = ? AND `main`.`main_leases`.`status` = ? AND `main`.`main_leases`.`endDate` <= ? AND `main`.`main_leases`.`endDate` >= ?) ORDER BY `main`.`main_leases`.`endDate` ASC LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`ejari_registrations`.`id`, `main`.`ejari_registrations`.`ejariNumber`, `main`.`ejari_registrations`.`registrationDate`, `main`.`ejari_registrations`.`expiryDate`, `main`.`ejari_registrations`.`certificateUrl`, `main`.`ejari_registrations`.`status`, `main`.`ejari_registrations`.`notes`, `main`.`ejari_registrations`.`subleaseId`, `main`.`ejari_registrations`.`subtenantId`, `main`.`ejari_registrations`.`isActive`, `main`.`ejari_registrations`.`createdAt`, `main`.`ejari_registrations`.`updatedAt`, `main`.`ejari_registrations`.`deletedAt` FROM `main`.`ejari_registrations` WHERE (`main`.`ejari_registrations`.`deletedAt` IS NULL AND `main`.`ejari_registrations`.`isActive` = ? AND `main`.`ejari_registrations`.`status` IN (?,?) AND `main`.`ejari_registrations`.`expiryDate` <= ? AND `main`.`ejari_registrations`.`expiryDate` >= ?) ORDER BY `main`.`ejari_registrations`.`expiryDate` ASC LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`properties`.`id`, `main`.`properties`.`name` FROM `main`.`properties` WHERE `main`.`properties`.`id` IN (?,?,?,?,?,?,?,?,?,?) LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`companies`.`id`, `main`.`companies`.`name` FROM `main`.`companies` WHERE `main`.`companies`.`id` IN (?,?,?,?,?) LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`subleases`.`id`, `main`.`subleases`.`subleaseNumber` FROM `main`.`subleases` WHERE `main`.`subleases`.`id` IN (?,?,?,?,?,?,?,?,?,?) LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`properties`.`id`, `main`.`properties`.`propertyType` FROM `main`.`properties` WHERE (`main`.`properties`.`deletedAt` IS NULL AND `main`.`properties`.`isActive` = ?) LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`subtenants`.`id`, `main`.`subtenants`.`name`, `main`.`subtenants`.`tradeName` FROM `main`.`subtenants` WHERE `main`.`subtenants`.`id` IN (?,?,?,?,?,?,?,?,?,?) LIMIT ? OFFSET ?
+prisma:query SELECT COUNT(*) AS `_count$_all` FROM (SELECT `main`.`subleases`.`id` FROM `main`.`subleases` WHERE (`main`.`subleases`.`deletedAt` IS NULL AND `main`.`subleases`.`isActive` = ? AND `main`.`subleases`.`status` = ?) LIMIT ? OFFSET ?) AS `sub`
+prisma:query SELECT `main`.`units`.`id`, `main`.`units`.`status`, `main`.`units`.`propertyId` FROM `main`.`units` WHERE ((`main`.`units`.`deletedAt` IS NULL AND `main`.`units`.`isActive` = ?) AND `main`.`units`.`propertyId` IN (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)) LIMIT ? OFFSET ?
+prisma:query SELECT COUNT(`main`.`units`.`status`) AS `_count$status`, `main`.`units`.`status` FROM `main`.`units` WHERE (`main`.`units`.`deletedAt` IS NULL AND `main`.`units`.`isActive` = ?) GROUP BY `main`.`units`.`status` LIMIT ? OFFSET ?
+prisma:query SELECT SUM(`contractValue`) AS `_sum$contractValue` FROM (SELECT `main`.`subleases`.`contractValue` FROM `main`.`subleases` WHERE (`main`.`subleases`.`deletedAt` IS NULL AND `main`.`subleases`.`isActive` = ? AND `main`.`subleases`.`status` = ?) LIMIT ? OFFSET ?) AS `sub`
+prisma:query SELECT SUM(`contractValue`) AS `_sum$contractValue`, SUM(`subLeaseFee`) AS `_sum$subLeaseFee` FROM (SELECT `main`.`subleases`.`contractValue`, `main`.`subleases`.`subLeaseFee` FROM `main`.`subleases` WHERE (`main`.`subleases`.`deletedAt` IS NULL AND `main`.`subleases`.`isActive` = ? AND `main`.`subleases`.`status` = ?) LIMIT ? OFFSET ?) AS `sub`
+prisma:query SELECT `main`.`subleases`.`id`, `main`.`subleases`.`contractValue`, `main`.`subleases`.`subLeaseFee`, `main`.`subleases`.`endDate` FROM `main`.`subleases` WHERE (`main`.`subleases`.`deletedAt` IS NULL AND `main`.`subleases`.`isActive` = ? AND `main`.`subleases`.`status` = ? AND `main`.`subleases`.`endDate` >= ?) LIMIT ? OFFSET ?
+ GET /api/dashboard 200 in 14ms (compile: 1973µs, render: 12ms)
+ GET / 200 in 26ms (compile: 3ms, render: 24ms)
+prisma:query SELECT COUNT(*) AS `_count$_all` FROM (SELECT `main`.`properties`.`id` FROM `main`.`properties` WHERE (`main`.`properties`.`deletedAt` IS NULL AND `main`.`properties`.`isActive` = ?) LIMIT ? OFFSET ?) AS `sub`
+prisma:query SELECT COUNT(*) AS `_count$_all` FROM (SELECT `main`.`units`.`id` FROM `main`.`units` WHERE (`main`.`units`.`deletedAt` IS NULL AND `main`.`units`.`isActive` = ?) LIMIT ? OFFSET ?) AS `sub`
+prisma:query SELECT COUNT(*) AS `_count$_all` FROM (SELECT `main`.`units`.`id` FROM `main`.`units` WHERE (`main`.`units`.`deletedAt` IS NULL AND `main`.`units`.`isActive` = ? AND `main`.`units`.`status` = ?) LIMIT ? OFFSET ?) AS `sub`
+prisma:query SELECT SUM(`rentAmount`) AS `_sum$rentAmount` FROM (SELECT `main`.`units`.`rentAmount` FROM `main`.`units` WHERE (`main`.`units`.`deletedAt` IS NULL AND `main`.`units`.`isActive` = ? AND `main`.`units`.`rentAmount` IS NOT NULL) LIMIT ? OFFSET ?) AS `sub`
+prisma:query SELECT COUNT(*) AS `_count$_all` FROM (SELECT `main`.`subleases`.`id` FROM `main`.`subleases` WHERE (`main`.`subleases`.`deletedAt` IS NULL AND `main`.`subleases`.`isActive` = ? AND `main`.`subleases`.`status` = ?) LIMIT ? OFFSET ?) AS `sub`
+prisma:query SELECT COUNT(*) AS `_count$_all` FROM (SELECT `main`.`main_leases`.`id` FROM `main`.`main_leases` WHERE (`main`.`main_leases`.`deletedAt` IS NULL AND `main`.`main_leases`.`isActive` = ? AND `main`.`main_leases`.`status` = ?) LIMIT ? OFFSET ?) AS `sub`
+prisma:query SELECT `main`.`properties`.`id`, `main`.`properties`.`propertyType` FROM `main`.`properties` WHERE (`main`.`properties`.`deletedAt` IS NULL AND `main`.`properties`.`isActive` = ?) LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`main_leases`.`id`, `main`.`main_leases`.`contractNo`, `main`.`main_leases`.`leaseNumber`, `main`.`main_leases`.`startDate`, `main`.`main_leases`.`endDate`, `main`.`main_leases`.`rentAmount`, `main`.`main_leases`.`rentFrequency`, `main`.`main_leases`.`securityDeposit`, `main`.`main_leases`.`incrementPercent`, `main`.`main_leases`.`incrementFrequency`, `main`.`main_leases`.`landlordName`, `main`.`main_leases`.`landlordContact`, `main`.`main_leases`.`landlordEmail`, `main`.`main_leases`.`tenantNumber`, `main`.`main_leases`.`landNumber`, `main`.`main_leases`.`annualRentPerSqFt`, `main`.`main_leases`.`location`, `main`.`main_leases`.`terms`, `main`.`main_leases`.`notes`, `main`.`main_leases`.`status`, `main`.`main_leases`.`renewalStatus`, `main`.`main_leases`.`renewedFromId`, `main`.`main_leases`.`propertyId`, `main`.`main_leases`.`companyId`, `main`.`main_leases`.`isActive`, `main`.`main_leases`.`createdAt`, `main`.`main_leases`.`updatedAt`, `main`.`main_leases`.`deletedAt` FROM `main`.`main_leases` WHERE (`main`.`main_leases`.`deletedAt` IS NULL AND `main`.`main_leases`.`isActive` = ? AND `main`.`main_leases`.`status` = ? AND `main`.`main_leases`.`endDate` <= ? AND `main`.`main_leases`.`endDate` >= ?) ORDER BY `main`.`main_leases`.`endDate` ASC LIMIT ? OFFSET ?
+prisma:query SELECT COUNT(`main`.`units`.`status`) AS `_count$status`, `main`.`units`.`status` FROM `main`.`units` WHERE (`main`.`units`.`deletedAt` IS NULL AND `main`.`units`.`isActive` = ?) GROUP BY `main`.`units`.`status` LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`properties`.`id`, `main`.`properties`.`name` FROM `main`.`properties` WHERE `main`.`properties`.`id` IN (?,?,?,?,?,?,?,?,?,?) LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`units`.`id`, `main`.`units`.`status`, `main`.`units`.`propertyId` FROM `main`.`units` WHERE ((`main`.`units`.`deletedAt` IS NULL AND `main`.`units`.`isActive` = ?) AND `main`.`units`.`propertyId` IN (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)) LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`companies`.`id`, `main`.`companies`.`name` FROM `main`.`companies` WHERE `main`.`companies`.`id` IN (?,?,?,?,?) LIMIT ? OFFSET ?
+prisma:query SELECT SUM(`contractValue`) AS `_sum$contractValue`, SUM(`subLeaseFee`) AS `_sum$subLeaseFee` FROM (SELECT `main`.`subleases`.`contractValue`, `main`.`subleases`.`subLeaseFee` FROM `main`.`subleases` WHERE (`main`.`subleases`.`deletedAt` IS NULL AND `main`.`subleases`.`isActive` = ? AND `main`.`subleases`.`status` = ?) LIMIT ? OFFSET ?) AS `sub`
+prisma:query SELECT SUM(`contractValue`) AS `_sum$contractValue` FROM (SELECT `main`.`subleases`.`contractValue` FROM `main`.`subleases` WHERE (`main`.`subleases`.`deletedAt` IS NULL AND `main`.`subleases`.`isActive` = ? AND `main`.`subleases`.`status` = ?) LIMIT ? OFFSET ?) AS `sub`
+prisma:query SELECT `main`.`ejari_registrations`.`id`, `main`.`ejari_registrations`.`ejariNumber`, `main`.`ejari_registrations`.`registrationDate`, `main`.`ejari_registrations`.`expiryDate`, `main`.`ejari_registrations`.`certificateUrl`, `main`.`ejari_registrations`.`status`, `main`.`ejari_registrations`.`notes`, `main`.`ejari_registrations`.`subleaseId`, `main`.`ejari_registrations`.`subtenantId`, `main`.`ejari_registrations`.`isActive`, `main`.`ejari_registrations`.`createdAt`, `main`.`ejari_registrations`.`updatedAt`, `main`.`ejari_registrations`.`deletedAt` FROM `main`.`ejari_registrations` WHERE (`main`.`ejari_registrations`.`deletedAt` IS NULL AND `main`.`ejari_registrations`.`isActive` = ? AND `main`.`ejari_registrations`.`status` IN (?,?) AND `main`.`ejari_registrations`.`expiryDate` <= ? AND `main`.`ejari_registrations`.`expiryDate` >= ?) ORDER BY `main`.`ejari_registrations`.`expiryDate` ASC LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`subleases`.`id`, `main`.`subleases`.`subleaseNumber` FROM `main`.`subleases` WHERE `main`.`subleases`.`id` IN (?,?,?,?,?,?,?,?,?,?) LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`subtenants`.`id`, `main`.`subtenants`.`name`, `main`.`subtenants`.`tradeName` FROM `main`.`subtenants` WHERE `main`.`subtenants`.`id` IN (?,?,?,?,?,?,?,?,?,?) LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`compliance_alerts`.`id`, `main`.`compliance_alerts`.`type`, `main`.`compliance_alerts`.`title`, `main`.`compliance_alerts`.`description`, `main`.`compliance_alerts`.`entityType`, `main`.`compliance_alerts`.`entityId`, `main`.`compliance_alerts`.`expiryDate`, `main`.`compliance_alerts`.`daysUntilExpiry`, `main`.`compliance_alerts`.`status`, `main`.`compliance_alerts`.`isNotified`, `main`.`compliance_alerts`.`notifiedAt`, `main`.`compliance_alerts`.`resolvedAt`, `main`.`compliance_alerts`.`notes`, `main`.`compliance_alerts`.`createdAt`, `main`.`compliance_alerts`.`updatedAt` FROM `main`.`compliance_alerts` WHERE `main`.`compliance_alerts`.`status` IN (?,?,?) ORDER BY `main`.`compliance_alerts`.`createdAt` DESC LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`subleases`.`id`, `main`.`subleases`.`contractValue`, `main`.`subleases`.`subLeaseFee`, `main`.`subleases`.`endDate` FROM `main`.`subleases` WHERE (`main`.`subleases`.`deletedAt` IS NULL AND `main`.`subleases`.`isActive` = ? AND `main`.`subleases`.`status` = ? AND `main`.`subleases`.`endDate` >= ?) LIMIT ? OFFSET ?
+ GET /api/dashboard 200 in 12ms (compile: 2ms, render: 10ms)
+ GET /api/compliance 200 in 115ms (compile: 107ms, render: 8ms)
+prisma:query SELECT 1
+prisma:query SELECT 1
+prisma:query SELECT COUNT(*) AS `_count$_all` FROM (SELECT `main`.`compliance_alerts`.`id` FROM `main`.`compliance_alerts` WHERE 1=1 LIMIT ? OFFSET ?) AS `sub`
+prisma:query SELECT `main`.`compliance_alerts`.`id`, `main`.`compliance_alerts`.`type`, `main`.`compliance_alerts`.`title`, `main`.`compliance_alerts`.`description`, `main`.`compliance_alerts`.`entityType`, `main`.`compliance_alerts`.`entityId`, `main`.`compliance_alerts`.`expiryDate`, `main`.`compliance_alerts`.`daysUntilExpiry`, `main`.`compliance_alerts`.`status`, `main`.`compliance_alerts`.`isNotified`, `main`.`compliance_alerts`.`notifiedAt`, `main`.`compliance_alerts`.`resolvedAt`, `main`.`compliance_alerts`.`notes`, `main`.`compliance_alerts`.`createdAt`, `main`.`compliance_alerts`.`updatedAt` FROM `main`.`compliance_alerts` WHERE 1=1 ORDER BY `main`.`compliance_alerts`.`createdAt` DESC LIMIT ? OFFSET ?
+prisma:query SELECT COUNT(*) AS `_count$_all` FROM (SELECT `main`.`subleases`.`id` FROM `main`.`subleases` WHERE `main`.`subleases`.`deletedAt` IS NULL LIMIT ? OFFSET ?) AS `sub`
+prisma:query SELECT `main`.`subleases`.`id`, `main`.`subleases`.`subleaseNumber`, `main`.`subleases`.`contractValue`, `main`.`subleases`.`subLeaseFee`, `main`.`subleases`.`startDate`, `main`.`subleases`.`endDate`, `main`.`subleases`.`rentAmount`, `main`.`subleases`.`rentFrequency`, `main`.`subleases`.`securityDeposit`, `main`.`subleases`.`incrementPercent`, `main`.`subleases`.`incrementFrequency`, `main`.`subleases`.`terms`, `main`.`subleases`.`notes`, `main`.`subleases`.`status`, `main`.`subleases`.`renewalStatus`, `main`.`subleases`.`renewedFromId`, `main`.`subleases`.`mainLeaseId`, `main`.`subleases`.`unitId`, `main`.`subleases`.`subtenantId`, `main`.`subleases`.`isActive`, `main`.`subleases`.`createdAt`, `main`.`subleases`.`updatedAt`, `main`.`subleases`.`deletedAt` FROM `main`.`subleases` WHERE `main`.`subleases`.`deletedAt` IS NULL ORDER BY `main`.`subleases`.`createdAt` DESC LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`main_leases`.`id`, `main`.`main_leases`.`leaseNumber`, `main`.`main_leases`.`contractNo`, `main`.`main_leases`.`propertyId` FROM `main`.`main_leases` WHERE `main`.`main_leases`.`id` IN (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`properties`.`id`, `main`.`properties`.`name` FROM `main`.`properties` WHERE `main`.`properties`.`id` IN (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`units`.`id`, `main`.`units`.`unitNumber`, `main`.`units`.`unitType`, `main`.`units`.`area`, `main`.`units`.`rentAmount` FROM `main`.`units` WHERE `main`.`units`.`id` IN (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`subtenants`.`id`, `main`.`subtenants`.`name`, `main`.`subtenants`.`tradeName`, `main`.`subtenants`.`phone`, `main`.`subtenants`.`email` FROM `main`.`subtenants` WHERE `main`.`subtenants`.`id` IN (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) LIMIT ? OFFSET ?
+ GET /api/subleases?pageSize=200 200 in 109ms (compile: 84ms, render: 25ms)
+prisma:query SELECT `main`.`invoices`.`id`, `main`.`invoices`.`invoiceNumber`, `main`.`invoices`.`issueDate`, `main`.`invoices`.`dueDate`, `main`.`invoices`.`periodStart`, `main`.`invoices`.`periodEnd`, `main`.`invoices`.`rentAmount`, `main`.`invoices`.`otherCharges`, `main`.`invoices`.`vatAmount`, `main`.`invoices`.`totalAmount`, `main`.`invoices`.`amountPaid`, `main`.`invoices`.`balanceDue`, `main`.`invoices`.`status`, `main`.`invoices`.`notes`, `main`.`invoices`.`subleaseId`, `main`.`invoices`.`isActive`, `main`.`invoices`.`createdAt`, `main`.`invoices`.`updatedAt`, `main`.`invoices`.`deletedAt` FROM `main`.`invoices` WHERE `main`.`invoices`.`deletedAt` IS NULL ORDER BY `main`.`invoices`.`createdAt` DESC LIMIT ? OFFSET ?
+prisma:query SELECT COUNT(*) AS `_count$_all` FROM (SELECT `main`.`invoices`.`id` FROM `main`.`invoices` WHERE `main`.`invoices`.`deletedAt` IS NULL LIMIT ? OFFSET ?) AS `sub`
+ GET /api/invoices?page=1&pageSize=10 200 in 98ms (compile: 91ms, render: 7ms)
+prisma:query SELECT `main`.`receipts`.`id`, `main`.`receipts`.`receiptNumber`, `main`.`receipts`.`invoiceId`, `main`.`receipts`.`amount`, `main`.`receipts`.`paymentDate`, `main`.`receipts`.`paymentMethod`, `main`.`receipts`.`referenceNo`, `main`.`receipts`.`bankName`, `main`.`receipts`.`notes`, `main`.`receipts`.`isActive`, `main`.`receipts`.`createdAt`, `main`.`receipts`.`updatedAt`, `main`.`receipts`.`deletedAt` FROM `main`.`receipts` WHERE `main`.`receipts`.`deletedAt` IS NULL ORDER BY `main`.`receipts`.`createdAt` DESC LIMIT ? OFFSET ?
+prisma:query SELECT COUNT(*) AS `_count$_all` FROM (SELECT `main`.`receipts`.`id` FROM `main`.`receipts` WHERE `main`.`receipts`.`deletedAt` IS NULL LIMIT ? OFFSET ?) AS `sub`
+ GET /api/receipts?page=1&pageSize=10 200 in 79ms (compile: 73ms, render: 5ms)

@@ -3,7 +3,7 @@
   "build": {
     "builder": "nixpacks",
     "buildCommand": "npm install --include=dev && npm run build",
-    "startCommand": "npm run db:deploy && node .next/standalone/server.js"
+    "startCommand": "npm start"
   },
   "deploy": {
     "numReplicas": 1,

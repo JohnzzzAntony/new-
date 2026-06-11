@@ -19,19 +19,9 @@ export function getDb(): PrismaClient {
   }
 
   const url = process.env.DATABASE_URL
-  const isPostgresUrl = url && (url.startsWith('postgresql://') || url.startsWith('postgres://'))
-  const isSqliteUrl = url && url.startsWith('file:')
 
-  if (isPostgresUrl) {
-    // PostgreSQL (production/Railway) - explicitly set the datasource URL
-    globalForPrisma.prisma = new PrismaClient({
-      log: process.env.NODE_ENV === 'production' ? ['warn', 'error'] : ['query'],
-      datasources: {
-        db: { url },
-      },
-    })
-  } else if (isSqliteUrl) {
-    // SQLite (local dev) - use the URL directly, no override needed
+  if (url && (url.startsWith('postgresql://') || url.startsWith('postgres://') || url.startsWith('file:'))) {
+    // Valid database URL - use it directly
     globalForPrisma.prisma = new PrismaClient({
       log: process.env.NODE_ENV === 'production' ? ['warn', 'error'] : ['query'],
       datasources: {
@@ -39,7 +29,7 @@ export function getDb(): PrismaClient {
       },
     })
   } else {
-    // Fallback: try .env file for PostgreSQL URL, or just use default
+    // Fallback: try .env file, or just use default
     try {
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       const dotenv = require('dotenv')

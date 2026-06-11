@@ -21,3 +21,23 @@ Stage Summary:
 - Also fixed Dockerfile COPY syntax and updated .gitignore
 - Code pushed to GitHub, Railway should auto-deploy
 - Local site confirmed working (DREC PMS login page)
+
+---
+Task ID: 2
+Agent: Main Agent
+Task: Fix site not loading - showing only "z"
+
+Work Log:
+- Investigated why the user sees only "z" on the page
+- Found that the dev server process keeps dying between Bash tool calls
+- The Bun parent process exits but the Node.js child process (next-server) keeps running
+- Verified the HTML renders correctly with proper title and login form content
+- Created auto-restart server script (keep-server-alive.sh) to keep the server running persistently
+- Browser-verified the site renders correctly: DREC PMS login page with email/password fields and demo account buttons
+- Server confirmed running and responding with HTTP 200
+
+Stage Summary:
+- The "z" was caused by the dev server being intermittently down
+- Fixed by setting up a persistent server keeper process
+- Site now renders correctly: full DREC PMS login page
+- Railway deployment fix already pushed to GitHub (commit 333ee39)

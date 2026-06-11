@@ -9,6 +9,8 @@ RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 COPY package.json package-lock.json* bun.lock* ./
 COPY prisma ./prisma/
+# Switch to PostgreSQL schema for production build
+RUN if [ -f prisma/schema.prisma.pg ]; then cp prisma/schema.prisma.pg prisma/schema.prisma; fi
 RUN npm install
 
 # Stage 2: Build the application
@@ -17,6 +19,9 @@ RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+
+# Ensure PostgreSQL schema is active for build
+RUN if [ -f prisma/schema.prisma.pg ]; then cp prisma/schema.prisma.pg prisma/schema.prisma; fi
 
 # Dummy DATABASE_URL for build time (API routes use force-dynamic)
 ENV DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy"
@@ -46,9 +51,6 @@ COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 COPY --from=builder /app/node_modules/prisma ./node_modules/prisma
-
-# Copy dotenv for db.ts fallback
-COPY --from=builder /app/.env* ./
 
 USER nextjs
 

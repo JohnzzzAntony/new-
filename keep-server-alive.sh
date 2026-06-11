@@ -6,6 +6,6 @@ while true; do
     cd /home/z/my-project && bun run dev >> /home/z/my-project/dev.log 2>&1 &
     sleep 8
   else
-    sleep 5
+    sleep 3
   fi
 done

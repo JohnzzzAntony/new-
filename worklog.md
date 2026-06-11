@@ -41,3 +41,28 @@ Stage Summary:
 - Fixed by setting up a persistent server keeper process
 - Site now renders correctly: full DREC PMS login page
 - Railway deployment fix already pushed to GitHub (commit 333ee39)
+
+---
+Task ID: 3
+Agent: Main Agent
+Task: Restore data - user reported all data is gone
+
+Work Log:
+- Investigated: local .env has SQLite URL but Prisma schema was PostgreSQL - incompatible
+- Created dual schema approach: schema.prisma.sqlite.local for dev, schema.prisma.pg for production
+- Updated db.ts to handle both SQLite and PostgreSQL URLs properly
+- Switched Prisma to SQLite provider locally, pushed schema, seeded database
+- Ran seed.ts successfully - created 41 main leases, 176 subleases, 161 subtenants, 10 companies, 4 users
+- Updated Dockerfile to auto-switch to PostgreSQL schema during Railway build
+- Added scripts/db-setup.sh for easy schema switching
+- Committed PostgreSQL schema to git (for Railway), keeping SQLite schema locally
+- Pushed all changes to GitHub (commit 04cf3f5)
+- Verified: Login works (admin@drec.ae / Admin123!), Dashboard API returns all data
+- KPIs confirmed: 41 properties, 172 units, 100% occupancy, 42.8M AED revenue, 32 active leases, 118 active subleases
+
+Stage Summary:
+- Root cause: Prisma schema was PostgreSQL but local DATABASE_URL was SQLite - data couldn't be read
+- Fix: Created dual schema approach + seeded local SQLite database
+- All DREC data restored: 41 main leases, 176 subleases, 161 subtenants, 10 companies
+- Railway will use PostgreSQL schema (auto-switched in Dockerfile)
+- Local dev uses SQLite schema

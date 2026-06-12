@@ -56,13 +56,8 @@ COPY --from=builder /app/public ./public
 
 # Copy Prisma engine + schema for migrate deploy at container startup
 COPY --from=builder /app/prisma ./prisma
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
-COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
-COPY --from=builder /app/node_modules/prisma ./node_modules/prisma
-# Prisma v6+ requires 'effect' package at runtime via @prisma/config
-COPY --from=builder /app/node_modules/effect ./node_modules/effect
-# @effect scoped packages (guarded: directory is created in builder if absent)
-COPY --from=builder /app/node_modules/@effect ./node_modules/@effect
+# Copy full node_modules from builder to ensure all Prisma CLI dependencies (like effect, fast-check, etc.) are present
+COPY --from=builder /app/node_modules ./node_modules
 
 EXPOSE 8080
 

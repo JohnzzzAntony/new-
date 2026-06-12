@@ -46,8 +46,8 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV HOSTNAME=0.0.0.0
 ENV NEXT_TELEMETRY_DISABLED=1
-# PORT is injected by Railway at runtime; default to 3000
-ENV PORT=3000
+# PORT is injected by Railway at runtime; default to 8080
+ENV PORT=8080
 
 # Copy Next.js standalone bundle
 COPY --from=builder /app/.next/standalone ./
@@ -64,7 +64,7 @@ COPY --from=builder /app/node_modules/effect ./node_modules/effect
 # @effect scoped packages (guarded: directory is created in builder if absent)
 COPY --from=builder /app/node_modules/@effect ./node_modules/@effect
 
-EXPOSE 3000
+EXPOSE 8080
 
 # Run DB migrations then start the standalone server
 CMD ["sh", "-c", "npx prisma migrate deploy && node server.js"]

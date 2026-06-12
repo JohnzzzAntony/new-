@@ -88,19 +88,30 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
 
+    // Validate required fields
+    if (!body.name) {
+      return NextResponse.json({ error: 'Property name is required' }, { status: 400 });
+    }
+    if (!body.propertyCode) {
+      return NextResponse.json({ error: 'Property code is required' }, { status: 400 });
+    }
+    if (!body.companyId) {
+      return NextResponse.json({ error: 'Company is required' }, { status: 400 });
+    }
+
     const property = await db.property.create({
       data: {
         name: body.name,
         propertyCode: body.propertyCode,
         propertyType: body.propertyType || 'INDUSTRIAL',
-        description: body.description,
-        address: body.address,
+        description: body.description || null,
+        address: body.address || '',
         city: body.city || 'Dubai',
-        area: body.area,
-        plotNumber: body.plotNumber,
-        totalArea: body.totalArea,
-        builtUpArea: body.builtUpArea,
-        yearBuilt: body.yearBuilt,
+        area: body.area || null,
+        plotNumber: body.plotNumber || null,
+        totalArea: body.totalArea ? parseFloat(body.totalArea) : null,
+        builtUpArea: body.builtUpArea ? parseFloat(body.builtUpArea) : null,
+        yearBuilt: body.yearBuilt ? parseInt(body.yearBuilt) : null,
         companyId: body.companyId,
         isActive: body.isActive ?? true,
       },
@@ -131,7 +142,7 @@ export async function POST(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   try {
     const body = await request.json();
-    const { id, ...updateData } = body;
+    const { id } = body;
 
     if (!id) {
       return NextResponse.json(
@@ -150,6 +161,23 @@ export async function PUT(request: NextRequest) {
         { status: 404 }
       );
     }
+
+    // Whitelist only valid Prisma scalar/enum fields — exclude relation objects
+    // (company, unitCount, _count) and auto-managed timestamps (createdAt, updatedAt, deletedAt).
+    const updateData: Record<string, unknown> = {};
+    if (body.name !== undefined) updateData.name = body.name;
+    if (body.propertyCode !== undefined) updateData.propertyCode = body.propertyCode;
+    if (body.propertyType !== undefined) updateData.propertyType = body.propertyType;
+    if (body.description !== undefined) updateData.description = body.description;
+    if (body.address !== undefined) updateData.address = body.address;
+    if (body.city !== undefined) updateData.city = body.city;
+    if (body.area !== undefined) updateData.area = body.area;
+    if (body.plotNumber !== undefined) updateData.plotNumber = body.plotNumber;
+    if (body.totalArea !== undefined) updateData.totalArea = body.totalArea !== null && body.totalArea !== '' ? parseFloat(body.totalArea) : null;
+    if (body.builtUpArea !== undefined) updateData.builtUpArea = body.builtUpArea !== null && body.builtUpArea !== '' ? parseFloat(body.builtUpArea) : null;
+    if (body.yearBuilt !== undefined) updateData.yearBuilt = body.yearBuilt !== null && body.yearBuilt !== '' ? parseInt(body.yearBuilt) : null;
+    if (body.companyId !== undefined) updateData.companyId = body.companyId;
+    if (body.isActive !== undefined) updateData.isActive = body.isActive;
 
     const property = await db.property.update({
       where: { id },
@@ -180,6 +208,8 @@ export async function PUT(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   try {
+    // The generic API client sends DELETE with id as a query param.
+    // Read from URL search params (not body — fetch ignores bodies on DELETE).
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
 

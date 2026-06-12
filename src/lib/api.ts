@@ -57,7 +57,7 @@ function createCrudApi<T>(basePath: string) {
     update: (id: string, data: Partial<T>) =>
       apiFetch<T>(basePath, { method: 'PUT', body: JSON.stringify({ id, ...data }) }),
     delete: (id: string) =>
-      apiFetch<T>(basePath, { method: 'DELETE', body: JSON.stringify({ id }) }),
+      apiFetch<T>(`${basePath}?id=${encodeURIComponent(id)}`, { method: 'DELETE' }),
   }
 }
 

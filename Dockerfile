@@ -67,4 +67,4 @@ COPY --from=builder /app/node_modules/@effect ./node_modules/@effect
 EXPOSE 8080
 
 # Run DB migrations then start the standalone server
-CMD ["sh", "-c", "npx prisma migrate deploy && node server.js"]
+CMD ["sh", "-c", "node node_modules/prisma/build/index.js migrate deploy && node server.js"]

@@ -47,7 +47,7 @@ export async function getAuthUser(request: NextRequest) {
   const authResult = verifyAuthToken(request);
   if (!authResult) return null;
 
-  const user = await db.user.findUnique({
+  const user = await db.user.findFirst({
     where: { id: authResult.userId, deletedAt: null, isActive: true },
     select: {
       id: true,

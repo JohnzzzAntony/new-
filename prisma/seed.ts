@@ -359,7 +359,7 @@ async function main() {
     const endDate = new Date(row.leaseTo)
     const now = new Date()
     const startDate = new Date(row.leaseFrom)
-    let status = LeaseStatus.ACTIVE
+    let status: LeaseStatus = LeaseStatus.ACTIVE
     if (endDate < now) status = LeaseStatus.EXPIRED
     else if (startDate > now) status = LeaseStatus.DRAFT
 
@@ -459,7 +459,7 @@ async function main() {
     // Determine sublease status
     const subEndDate = new Date(sub.expiresOn)
     const nowDate = new Date()
-    let subStatus = SubleaseStatus.ACTIVE
+    let subStatus: SubleaseStatus = SubleaseStatus.ACTIVE
     if (subEndDate < nowDate) subStatus = SubleaseStatus.EXPIRED
 
     // Create sublease

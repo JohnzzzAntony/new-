@@ -66,10 +66,10 @@ bun run dev
 
 | Role | Email | Password |
 |------|-------|----------|
-| Super Admin | admin@drec.ae | admin123 |
-| Property Manager | manager@drec.ae | manager123 |
-| Finance User | finance@drec.ae | finance123 |
-| Read Only | viewer@drec.ae | viewer123 |
+| Super Admin | admin@drec.ae | Admin123! |
+| Property Manager | manager@drec.ae | Admin123! |
+| Finance User | finance@drec.ae | Admin123! |
+| Read Only | viewer@drec.ae | Admin123! |
 
 ## Project Structure
 

@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      const user = await db.user.findUnique({
+      const user = await db.user.findFirst({
         where: { email, deletedAt: null, isActive: true },
       });
 

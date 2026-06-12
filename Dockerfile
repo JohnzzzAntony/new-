@@ -34,6 +34,10 @@ ENV NEXT_TELEMETRY_DISABLED=1
 
 RUN npx prisma generate && npm run build
 
+# Ensure @effect directory exists so runner COPY never fails
+# (Prisma v6 only needs 'effect', not '@effect', but we guard it anyway)
+RUN mkdir -p /app/node_modules/@effect
+
 # ─── Stage 3: Production runner ────────────────────────────────────────────────
 FROM node:20-slim AS runner
 RUN apt-get update && apt-get install -y openssl ca-certificates && rm -rf /var/lib/apt/lists/*
@@ -55,8 +59,9 @@ COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 COPY --from=builder /app/node_modules/prisma ./node_modules/prisma
-# Prisma v6+ requires 'effect' and '@effect' packages at runtime via @prisma/config
+# Prisma v6+ requires 'effect' package at runtime via @prisma/config
 COPY --from=builder /app/node_modules/effect ./node_modules/effect
+# @effect scoped packages (guarded: directory is created in builder if absent)
 COPY --from=builder /app/node_modules/@effect ./node_modules/@effect
 
 EXPOSE 3000

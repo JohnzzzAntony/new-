@@ -33,8 +33,25 @@ const pageComponents: Record<string, React.ComponentType> = {
 }
 
 export function AppShell() {
-  const { activeTab, sidebarOpen } = useAppStore()
+  const { activeTab, sidebarOpen, setSidebarOpen } = useAppStore()
   const PageComponent = pageComponents[activeTab] || DashboardPage
+
+  React.useEffect(() => {
+    // Start closed on mobile/tablet screens
+    if (window.innerWidth < 1024) {
+      setSidebarOpen(false)
+    }
+
+    const handleResize = () => {
+      if (window.innerWidth < 1024) {
+        setSidebarOpen(false)
+      } else {
+        setSidebarOpen(true)
+      }
+    }
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [setSidebarOpen])
 
   return (
     <div className="min-h-screen flex bg-gray-50">

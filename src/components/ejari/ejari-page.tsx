@@ -84,7 +84,7 @@ export function EjariPage() {
           <FormField label="Certificate URL">
             <Input value={data.certificateUrl || ''} onChange={e => setData({...data, certificateUrl: e.target.value})} placeholder="Upload or enter URL" />
           </FormField>
-          <div className="col-span-2">
+          <div className="col-span-1 md:col-span-2">
             <FormField label="Notes">
               <Textarea value={data.notes || ''} onChange={e => setData({...data, notes: e.target.value})} rows={2} />
             </FormField>

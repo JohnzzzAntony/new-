@@ -220,21 +220,21 @@ export function RentCollectionPage() {
 
         {/* Invoices Tab */}
         <TabsContent value="invoices" className="space-y-4">
-          <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
-            <div className="flex gap-2 flex-1">
-              <div className="relative flex-1 sm:max-w-xs">
+          <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
+            <div className="flex flex-col xs:flex-row gap-2 flex-1 w-full">
+              <div className="relative flex-1 sm:max-w-xs w-full">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <Input placeholder="Search invoices..." value={searchQuery} onChange={e => { setSearchQuery(e.target.value); setInvoicePage(1) }} className="pl-9 h-9" />
+                <Input placeholder="Search invoices..." value={searchQuery} onChange={e => { setSearchQuery(e.target.value); setInvoicePage(1) }} className="pl-9 h-9 w-full" />
               </div>
               <Select value={invoiceStatus || 'all'} onValueChange={v => { setInvoiceStatus(v === 'all' ? '' : v); setInvoicePage(1) }}>
-                <SelectTrigger className="w-[140px] h-9"><SelectValue placeholder="Status" /></SelectTrigger>
+                <SelectTrigger className="w-full xs:w-[140px] h-9"><SelectValue placeholder="Status" /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Status</SelectItem>
                   {INVOICE_STATUSES.map(s => <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
-            <Button onClick={() => { setInvoiceData({}); setShowInvoiceForm(true) }} className="bg-emerald-600 hover:bg-emerald-700 h-9">
+            <Button onClick={() => { setInvoiceData({}); setShowInvoiceForm(true) }} className="bg-emerald-600 hover:bg-emerald-700 h-9 w-full sm:w-auto mt-2 sm:mt-0">
               <Plus className="w-4 h-4 mr-1" /> Create Invoice
             </Button>
           </div>

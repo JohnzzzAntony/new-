@@ -135,12 +135,12 @@ export function SubleasesPage() {
           <FormField label="Increment Freq (Years)">
             <Input type="number" value={data.incrementFrequency || ''} onChange={e => setData({...data, incrementFrequency: parseInt(e.target.value) || undefined})} />
           </FormField>
-          <div className="col-span-2">
+          <div className="col-span-1 md:col-span-2">
             <FormField label="Terms (JSON)">
               <Textarea value={data.terms || ''} onChange={e => setData({...data, terms: e.target.value})} rows={2} />
             </FormField>
           </div>
-          <div className="col-span-2">
+          <div className="col-span-1 md:col-span-2">
             <FormField label="Notes">
               <Textarea value={data.notes || ''} onChange={e => setData({...data, notes: e.target.value})} rows={2} />
             </FormField>

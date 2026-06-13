@@ -98,12 +98,12 @@ export function UnitsPage() {
           <FormField label="Amenities (JSON)">
             <Input value={data.amenities || ''} onChange={e => setData({...data, amenities: e.target.value})} placeholder='["Loading Dock", "AC"]' />
           </FormField>
-          <div className="col-span-2">
+          <div className="col-span-1 md:col-span-2">
             <FormField label="Description">
               <Textarea value={data.description || ''} onChange={e => setData({...data, description: e.target.value})} rows={2} />
             </FormField>
           </div>
-          <div className="col-span-2">
+          <div className="col-span-1 md:col-span-2">
             <FormField label="Notes">
               <Textarea value={data.notes || ''} onChange={e => setData({...data, notes: e.target.value})} rows={2} />
             </FormField>

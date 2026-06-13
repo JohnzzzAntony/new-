@@ -127,30 +127,32 @@ export function CompliancePage() {
 
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
-        <div className="flex gap-2 flex-1 w-full sm:w-auto">
-          <div className="relative flex-1 sm:max-w-xs">
+        <div className="flex flex-col sm:flex-row gap-2 flex-1 w-full sm:w-auto">
+          <div className="relative flex-1 sm:max-w-xs w-full">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <Input
               placeholder="Search compliance alerts..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9 h-9"
+              className="pl-9 h-9 w-full"
             />
           </div>
-          <Select value={typeFilter || 'all'} onValueChange={v => setTypeFilter(v === 'all' ? '' : v)}>
-            <SelectTrigger className="w-[180px] h-9"><SelectValue placeholder="All Types" /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Types</SelectItem>
-              {COMPLIANCE_TYPES.map(t => <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>)}
-            </SelectContent>
-          </Select>
-          <Select value={statusFilter || 'all'} onValueChange={v => setStatusFilter(v === 'all' ? '' : v)}>
-            <SelectTrigger className="w-[160px] h-9"><SelectValue placeholder="All Statuses" /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Statuses</SelectItem>
-              {COMPLIANCE_STATUSES.map(s => <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>)}
-            </SelectContent>
-          </Select>
+          <div className="flex gap-2 w-full sm:w-auto">
+            <Select value={typeFilter || 'all'} onValueChange={v => setTypeFilter(v === 'all' ? '' : v)}>
+              <SelectTrigger className="w-full sm:w-[180px] h-9"><SelectValue placeholder="All Types" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Types</SelectItem>
+                {COMPLIANCE_TYPES.map(t => <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>)}
+              </SelectContent>
+            </Select>
+            <Select value={statusFilter || 'all'} onValueChange={v => setStatusFilter(v === 'all' ? '' : v)}>
+              <SelectTrigger className="w-full sm:w-[160px] h-9"><SelectValue placeholder="All Statuses" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Statuses</SelectItem>
+                {COMPLIANCE_STATUSES.map(s => <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>)}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
       </div>
 
@@ -168,28 +170,30 @@ export function CompliancePage() {
             return (
               <Card key={alert.id} className="border-0 shadow-sm hover:shadow-md transition-shadow">
                 <CardContent className="p-4">
-                  <div className="flex items-start gap-3">
-                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
-                      alert.status === 'EXPIRED' ? 'bg-red-50' : alert.status === 'ACTION_REQUIRED' ? 'bg-orange-50' : alert.status === 'WARNING' ? 'bg-yellow-50' : 'bg-emerald-50'
-                    }`}>
-                      <Icon className={`w-5 h-5 ${
-                        alert.status === 'EXPIRED' ? 'text-red-500' : alert.status === 'ACTION_REQUIRED' ? 'text-orange-500' : alert.status === 'WARNING' ? 'text-yellow-500' : 'text-emerald-500'
-                      }`} />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <h4 className="font-medium text-sm">{alert.title}</h4>
-                        <StatusBadge status={alert.status} map={COMPLIANCE_STATUS_MAP} />
+                  <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
+                    <div className="flex items-start gap-3 flex-1 min-w-0 w-full">
+                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
+                        alert.status === 'EXPIRED' ? 'bg-red-50' : alert.status === 'ACTION_REQUIRED' ? 'bg-orange-50' : alert.status === 'WARNING' ? 'bg-yellow-50' : 'bg-emerald-50'
+                      }`}>
+                        <Icon className={`w-5 h-5 ${
+                          alert.status === 'EXPIRED' ? 'text-red-500' : alert.status === 'ACTION_REQUIRED' ? 'text-orange-500' : alert.status === 'WARNING' ? 'text-yellow-500' : 'text-emerald-500'
+                        }`} />
                       </div>
-                      <p className="text-xs text-gray-500 mb-2">{alert.description}</p>
-                      <div className="flex items-center gap-4 text-xs text-gray-400">
-                        <Badge variant="outline" className="text-xs">{(alert.type || '').replace(/_/g, ' ')}</Badge>
-                        {alert.expiryDate && <span>Expires: {formatDate(alert.expiryDate)}</span>}
-                        {alert.daysUntilExpiry != null && (
-                          <span className={alert.daysUntilExpiry < 0 ? 'text-red-500 font-medium' : ''}>
-                            {alert.daysUntilExpiry < 0 ? `${Math.abs(alert.daysUntilExpiry)}d overdue` : `${alert.daysUntilExpiry}d remaining`}
-                          </span>
-                        )}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex flex-wrap items-center gap-2 mb-1">
+                          <h4 className="font-medium text-sm">{alert.title}</h4>
+                          <StatusBadge status={alert.status} map={COMPLIANCE_STATUS_MAP} />
+                        </div>
+                        <p className="text-xs text-gray-500 mb-2">{alert.description}</p>
+                        <div className="flex flex-wrap items-center gap-3 text-xs text-gray-400">
+                          <Badge variant="outline" className="text-xs">{(alert.type || '').replace(/_/g, ' ')}</Badge>
+                          {alert.expiryDate && <span>Expires: {formatDate(alert.expiryDate)}</span>}
+                          {alert.daysUntilExpiry != null && (
+                            <span className={alert.daysUntilExpiry < 0 ? 'text-red-500 font-medium' : ''}>
+                              {alert.daysUntilExpiry < 0 ? `${Math.abs(alert.daysUntilExpiry)}d overdue` : `${alert.daysUntilExpiry}d remaining`}
+                            </span>
+                          )}
+                        </div>
                       </div>
                     </div>
                     {alert.status !== 'COMPLIANT' && (
@@ -197,7 +201,7 @@ export function CompliancePage() {
                         variant="outline"
                         size="sm"
                         onClick={() => { setResolveId(alert.id); setResolveNotes('') }}
-                        className="shrink-0"
+                        className="w-full sm:w-auto self-end sm:self-center shrink-0"
                       >
                         <CheckCircle className="w-3 h-3 mr-1" /> Resolve
                       </Button>

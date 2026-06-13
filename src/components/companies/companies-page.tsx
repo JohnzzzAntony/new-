@@ -1262,12 +1262,12 @@ export function CompaniesPage() {
           <FormField label="Contact Email">
             <Input type="email" value={data.contactEmail || ''} onChange={e => setData({...data, contactEmail: e.target.value})} />
           </FormField>
-          <div className="col-span-2">
+          <div className="col-span-1 md:col-span-2">
             <FormField label="Address">
               <Textarea value={data.address || ''} onChange={e => setData({...data, address: e.target.value})} placeholder="Full address" rows={2} />
             </FormField>
           </div>
-          <div className="col-span-2">
+          <div className="col-span-1 md:col-span-2">
             <FormField label="Notes">
               <Textarea value={data.notes || ''} onChange={e => setData({...data, notes: e.target.value})} placeholder="Additional notes" rows={2} />
             </FormField>

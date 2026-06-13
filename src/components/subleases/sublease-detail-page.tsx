@@ -439,36 +439,38 @@ export function SubleaseDetailPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center gap-4">
-        <Button variant="ghost" onClick={() => { clearDetail(); setActiveTab('subleases') }} className="h-9 px-3 text-gray-500 hover:text-gray-900">
-          <ArrowLeft className="w-4 h-4 mr-1" /> Back to Subleases
-        </Button>
-        <div className="flex-1">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
-              <FileSignature className="w-5 h-5 text-blue-600" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">{sublease.subleaseNumber}</h1>
-              <p className="text-sm text-gray-500">
-                {sublease.subtenant?.name} — {sublease.unit?.unitNumber} — {sublease.property?.name}
-              </p>
+      <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
+        <div className="flex items-center gap-4 flex-1 w-full min-w-0">
+          <Button variant="ghost" onClick={() => { clearDetail(); setActiveTab('subleases') }} className="h-9 px-3 text-gray-500 hover:text-gray-900 shrink-0">
+            <ArrowLeft className="w-4 h-4 mr-1" /> Back to Subleases
+          </Button>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center shrink-0">
+                <FileSignature className="w-5 h-5 text-blue-600" />
+              </div>
+              <div className="min-w-0">
+                <h1 className="text-2xl font-bold text-gray-900 truncate">{sublease.subleaseNumber}</h1>
+                <p className="text-sm text-gray-500 truncate">
+                  {sublease.subtenant?.name} — {sublease.unit?.unitNumber} — {sublease.property?.name}
+                </p>
+              </div>
             </div>
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={loadSublease}>
+        <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto justify-end sm:justify-start">
+          <Button variant="outline" size="sm" onClick={loadSublease} className="flex-1 sm:flex-none">
             <RefreshCw className="w-4 h-4 mr-1" /> Refresh
           </Button>
-          <Button variant="outline" size="sm" onClick={handleExportContract} disabled={exportLoading}>
+          <Button variant="outline" size="sm" onClick={handleExportContract} disabled={exportLoading} className="flex-1 sm:flex-none">
             {exportLoading ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <FileDown className="w-4 h-4 mr-1" />}
-            Export Contract
+            Export
           </Button>
           {!isEditing
-            ? <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700" onClick={() => setIsEditing(true)}>Edit</Button>
+            ? <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 flex-1 sm:flex-none" onClick={() => setIsEditing(true)}>Edit</Button>
             : <>
-              <Button size="sm" variant="outline" onClick={() => { setIsEditing(false); setForm(sublease) }}>Cancel</Button>
-              <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700" onClick={handleSave} disabled={saving}>
+              <Button size="sm" variant="outline" className="flex-1 sm:flex-none" onClick={() => { setIsEditing(false); setForm(sublease) }}>Cancel</Button>
+              <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 flex-1 sm:flex-none" onClick={handleSave} disabled={saving}>
                 {saving && <Loader2 className="w-4 h-4 mr-1 animate-spin" />}Save
               </Button>
             </>

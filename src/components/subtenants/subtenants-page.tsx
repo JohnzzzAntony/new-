@@ -53,7 +53,7 @@ export function SubtenantsPage() {
           <FormField label="Trade Name">
             <Input value={data.tradeName || ''} onChange={e => setData({...data, tradeName: e.target.value})} />
           </FormField>
-          <div className="col-span-2">
+          <div className="col-span-1 md:col-span-2">
             <FormField label="Linked Company (Optional — subtenant is always a company)">
               <Select value={data.companyId || 'none'} onValueChange={v => setData({...data, companyId: v === 'none' ? null : v})}>
                 <SelectTrigger><SelectValue placeholder="Link to existing Company record (optional)" /></SelectTrigger>
@@ -97,12 +97,12 @@ export function SubtenantsPage() {
           <FormField label="Country">
             <Input value={data.country || 'UAE'} onChange={e => setData({...data, country: e.target.value})} />
           </FormField>
-          <div className="col-span-2">
+          <div className="col-span-1 md:col-span-2">
             <FormField label="Address">
               <Textarea value={data.address || ''} onChange={e => setData({...data, address: e.target.value})} rows={2} />
             </FormField>
           </div>
-          <div className="col-span-2">
+          <div className="col-span-1 md:col-span-2">
             <FormField label="Notes">
               <Textarea value={data.notes || ''} onChange={e => setData({...data, notes: e.target.value})} rows={2} />
             </FormField>

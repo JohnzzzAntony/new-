@@ -25,7 +25,7 @@ const navItems = [
 ]
 
 export function Sidebar() {
-  const { activeTab, setActiveTab, sidebarOpen, toggleSidebar, user, logout } = useAppStore()
+  const { activeTab, setActiveTab, sidebarOpen, toggleSidebar, setSidebarOpen, user, logout } = useAppStore()
 
   return (
     <>
@@ -66,7 +66,12 @@ export function Sidebar() {
             return (
               <button
                 key={item.id}
-                onClick={() => { setActiveTab(item.id) }}
+                onClick={() => {
+                  setActiveTab(item.id)
+                  if (window.innerWidth < 1024) {
+                    setSidebarOpen(false)
+                  }
+                }}
                 className={cn(
                   'w-full flex items-center gap-3 px-4 py-2.5 text-sm transition-colors',
                   isActive

@@ -128,7 +128,7 @@ export function PropertiesPage() {
       ]}
       renderForm={(data, setData) => (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="col-span-2">
+          <div className="col-span-1 md:col-span-2">
             <h3 className="font-semibold text-gray-800 text-sm border-b pb-1">Property Information</h3>
           </div>
           
@@ -154,12 +154,12 @@ export function PropertiesPage() {
               </SelectContent>
             </Select>
           </FormField>
-          <div className="col-span-2">
+          <div className="col-span-1 md:col-span-2">
             <FormField label="Notes">
               <Textarea value={data.description || ''} onChange={e => setData({...data, description: e.target.value})} rows={2} />
             </FormField>
           </div>
-          <div className="col-span-2">
+          <div className="col-span-1 md:col-span-2">
             <FormField label="Address">
               <Textarea value={data.address || ''} onChange={e => setData({...data, address: e.target.value})} rows={2} />
             </FormField>
@@ -187,7 +187,7 @@ export function PropertiesPage() {
           </FormField>
 
           {/* Merged Lease Section */}
-          <div className="col-span-2 border-t pt-4 mt-2">
+          <div className="col-span-1 md:col-span-2 border-t pt-4 mt-2">
             <h3 className="font-semibold text-gray-800 text-sm border-b pb-1">Main Lease Information</h3>
           </div>
 
@@ -252,12 +252,12 @@ export function PropertiesPage() {
           <FormField label="Landlord Email">
             <Input type="email" value={data.landlordEmail || ''} onChange={e => setData({...data, landlordEmail: e.target.value})} />
           </FormField>
-          <div className="col-span-2">
+          <div className="col-span-1 md:col-span-2">
             <FormField label="Terms (JSON)">
               <Textarea value={data.terms || ''} onChange={e => setData({...data, terms: e.target.value})} rows={2} />
             </FormField>
           </div>
-          <div className="col-span-2">
+          <div className="col-span-1 md:col-span-2">
             <FormField label="Notes">
               <Textarea value={data.notes || ''} onChange={e => setData({...data, notes: e.target.value})} rows={2} />
             </FormField>

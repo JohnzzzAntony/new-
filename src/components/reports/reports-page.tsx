@@ -130,30 +130,32 @@ export function ReportsPage() {
       {/* Report Controls */}
       <Card className="border-0 shadow-sm">
         <CardContent className="p-4">
-          <div className="flex flex-col sm:flex-row gap-3 items-end">
-            <div className="flex-1 space-y-1">
+          <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-end">
+            <div className="flex-1 space-y-1 w-full">
               <label className="text-sm font-medium">Report Type</label>
               <Select value={reportType} onValueChange={setReportType}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
                 <SelectContent>
                   {REPORT_TYPES.map(t => <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
-            <Button onClick={generateReport} disabled={loading} className="bg-emerald-600 hover:bg-emerald-700 h-9">
-              {loading ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <BarChart3 className="w-4 h-4 mr-1" />}
-              Generate Report
-            </Button>
-            {data && (
-              <>
-                <Button variant="outline" onClick={exportCSV} className="h-9">
-                  <FileSpreadsheet className="w-4 h-4 mr-1" /> CSV
-                </Button>
-                <Button variant="outline" onClick={exportJSON} className="h-9">
-                  <FileText className="w-4 h-4 mr-1" /> JSON
-                </Button>
-              </>
-            )}
+            <div className="flex flex-wrap gap-2 w-full sm:w-auto items-stretch sm:items-end">
+              <Button onClick={generateReport} disabled={loading} className="bg-emerald-600 hover:bg-emerald-700 h-9 flex-1 sm:flex-none">
+                {loading ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <BarChart3 className="w-4 h-4 mr-1" />}
+                Generate Report
+              </Button>
+              {data && (
+                <>
+                  <Button variant="outline" onClick={exportCSV} className="h-9 flex-1 sm:flex-none">
+                    <FileSpreadsheet className="w-4 h-4 mr-1" /> CSV
+                  </Button>
+                  <Button variant="outline" onClick={exportJSON} className="h-9 flex-1 sm:flex-none">
+                    <FileText className="w-4 h-4 mr-1" /> JSON
+                  </Button>
+                </>
+              )}
+            </div>
           </div>
         </CardContent>
       </Card>

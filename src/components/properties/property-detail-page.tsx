@@ -305,31 +305,33 @@ export function PropertyDetailPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center gap-4">
-        <Button variant="ghost" onClick={handleBack} className="h-9 px-3 text-gray-500 hover:text-gray-900">
-          <ArrowLeft className="w-4 h-4 mr-1" /> Back to Properties
-        </Button>
-        <div className="flex-1">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center">
-              <Building2 className="w-5 h-5 text-emerald-600" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">{property.name}</h1>
-              <p className="text-sm text-gray-500 flex items-center gap-1">
-                <MapPin className="w-3 h-3" /> {property.address || property.area || property.city}
-                {property.plotNumber && <span className="ml-2 font-mono text-xs bg-gray-100 px-1.5 py-0.5 rounded">Plot: {property.plotNumber}</span>}
-              </p>
+      <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
+        <div className="flex items-center gap-4 flex-1 w-full min-w-0">
+          <Button variant="ghost" onClick={handleBack} className="h-9 px-3 text-gray-500 hover:text-gray-900 shrink-0">
+            <ArrowLeft className="w-4 h-4 mr-1" /> Back to Properties
+          </Button>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center shrink-0">
+                <Building2 className="w-5 h-5 text-emerald-600" />
+              </div>
+              <div className="min-w-0">
+                <h1 className="text-2xl font-bold text-gray-900 truncate">{property.name}</h1>
+                <p className="text-sm text-gray-500 flex items-center gap-1 truncate">
+                  <MapPin className="w-3 h-3 shrink-0" /> {property.address || property.area || property.city}
+                  {property.plotNumber && <span className="ml-2 font-mono text-xs bg-gray-100 px-1.5 py-0.5 rounded shrink-0">Plot: {property.plotNumber}</span>}
+                </p>
+              </div>
             </div>
           </div>
         </div>
-        <Button variant="outline" size="sm" onClick={loadAll}>
+        <Button variant="outline" size="sm" onClick={loadAll} className="w-full sm:w-auto">
           <RefreshCw className="w-4 h-4 mr-1" /> Refresh
         </Button>
       </div>
 
       {/* Property Summary Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {[
           { label: 'Property Code', value: property.propertyCode, icon: <Building2 className="w-4 h-4 text-blue-500" /> },
           { label: 'Total Area', value: property.totalArea ? `${property.totalArea.toLocaleString()} sqft` : '—', icon: <Box className="w-4 h-4 text-purple-500" /> },
@@ -449,12 +451,12 @@ export function PropertyDetailPage() {
                   <FormField label="Landlord Email">
                     <Input type="email" value={leaseForm.landlordEmail || ''} onChange={e => setLeaseForm({...leaseForm, landlordEmail: e.target.value})} />
                   </FormField>
-                  <div className="col-span-2">
+                  <div className="col-span-1 md:col-span-2">
                     <FormField label="Terms (JSON)">
                       <Textarea value={leaseForm.terms || ''} onChange={e => setLeaseForm({...leaseForm, terms: e.target.value})} rows={2} />
                     </FormField>
                   </div>
-                  <div className="col-span-2">
+                  <div className="col-span-1 md:col-span-2">
                     <FormField label="Notes">
                       <Textarea value={leaseForm.notes || ''} onChange={e => setLeaseForm({...leaseForm, notes: e.target.value})} rows={2} />
                     </FormField>
@@ -482,7 +484,7 @@ export function PropertyDetailPage() {
                   </Button>
                 </CardHeader>
                 <CardContent className="pt-4">
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-x-8 gap-y-5">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-8 gap-y-5">
                     <InfoRow label="Contract No." value={`#${mainLease.contractNo}`} />
                     <InfoRow label="Lease Number" value={mainLease.leaseNumber} />
                     <InfoRow label="Land No." value={mainLease.landNumber} />

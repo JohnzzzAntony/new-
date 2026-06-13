@@ -8,7 +8,6 @@ import { DashboardPage } from '@/components/dashboard/dashboard-page'
 import { CompaniesPage } from '@/components/companies/companies-page'
 import { PropertiesPage } from '@/components/properties/properties-page'
 import { UnitsPage } from '@/components/units/units-page'
-import { MainLeasesPage } from '@/components/leases/main-leases-page'
 import { SubtenantsPage } from '@/components/subtenants/subtenants-page'
 import { SubleasesPage } from '@/components/subleases/subleases-page'
 import { EjariPage } from '@/components/ejari/ejari-page'
@@ -21,7 +20,6 @@ const pageComponents: Record<string, React.ComponentType> = {
   companies: CompaniesPage,
   properties: PropertiesPage,
   units: UnitsPage,
-  'main-leases': MainLeasesPage,
   subtenants: SubtenantsPage,
   subleases: SubleasesPage,
   ejari: EjariPage,

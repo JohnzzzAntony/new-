@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
     const status = searchParams.get('status');
     const subtenantId = searchParams.get('subtenantId');
     const unitId = searchParams.get('unitId');
-    const mainLeaseId = searchParams.get('mainLeaseId');
+    const propertyId = searchParams.get('propertyId');
     const sortBy = searchParams.get('sortBy') || 'createdAt';
     const sortOrder = searchParams.get('sortOrder') || 'desc';
 
@@ -41,8 +41,8 @@ export async function GET(request: NextRequest) {
       where.unitId = unitId;
     }
 
-    if (mainLeaseId) {
-      where.mainLeaseId = mainLeaseId;
+    if (propertyId) {
+      where.propertyId = propertyId;
     }
 
     const orderBy: Record<string, string> = {};
@@ -55,14 +55,12 @@ export async function GET(request: NextRequest) {
         take: pageSize,
         orderBy,
         include: {
-          mainLease: {
+          property: {
             select: {
               id: true,
               leaseNumber: true,
               contractNo: true,
-              property: {
-                select: { id: true, name: true },
-              },
+              name: true,
             },
           },
           unit: {
@@ -112,20 +110,18 @@ export async function POST(request: NextRequest) {
         status: body.status || 'DRAFT',
         renewalStatus: body.renewalStatus || 'NONE',
         renewedFromId: body.renewedFromId,
-        mainLeaseId: body.mainLeaseId,
+        propertyId: body.propertyId,
         unitId: body.unitId,
         subtenantId: body.subtenantId,
         isActive: body.isActive ?? true,
       },
       include: {
-        mainLease: {
+        property: {
           select: {
             id: true,
             leaseNumber: true,
             contractNo: true,
-            property: {
-              select: { id: true, name: true },
-            },
+            name: true,
           },
         },
         unit: {
@@ -185,14 +181,12 @@ export async function PUT(request: NextRequest) {
       where: { id },
       data,
       include: {
-        mainLease: {
+        property: {
           select: {
             id: true,
             leaseNumber: true,
             contractNo: true,
-            property: {
-              select: { id: true, name: true },
-            },
+            name: true,
           },
         },
         unit: {

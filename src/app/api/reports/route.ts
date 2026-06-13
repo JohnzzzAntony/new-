@@ -127,10 +127,9 @@ export async function GET(request: NextRequest) {
       }
 
       case 'leases': {
-        const leases = await db.mainLease.findMany({
-          where: { deletedAt: null },
+        const leases = await db.property.findMany({
+          where: { deletedAt: null, leaseNumber: { not: null } },
           include: {
-            property: { select: { name: true, propertyCode: true } },
             company: { select: { name: true } },
             _count: { select: { subleases: { where: { deletedAt: null } } } },
           },
@@ -139,15 +138,15 @@ export async function GET(request: NextRequest) {
 
         const reportData = leases.map((l) => ({
           leaseNumber: l.leaseNumber,
-          propertyName: l.property.name,
-          propertyCode: l.property.propertyCode,
+          propertyName: l.name,
+          propertyCode: l.propertyCode,
           companyName: l.company.name,
           landlordName: l.landlordName,
-          startDate: l.startDate.toISOString().split('T')[0],
-          endDate: l.endDate.toISOString().split('T')[0],
+          startDate: l.leaseStartDate ? l.leaseStartDate.toISOString().split('T')[0] : 'N/A',
+          endDate: l.leaseEndDate ? l.leaseEndDate.toISOString().split('T')[0] : 'N/A',
           rentAmount: l.rentAmount,
           rentFrequency: l.rentFrequency,
-          status: l.status,
+          status: l.leaseStatus,
           renewalStatus: l.renewalStatus,
           subleaseCount: l._count.subleases,
           isActive: l.isActive,

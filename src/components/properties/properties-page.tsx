@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import { ModulePage, FormField, formatDate, StatusBadge } from '@/components/common/module-page'
+import { ModulePage, FormField, formatDate, StatusBadge, LEASE_STATUS_MAP } from '@/components/common/module-page'
 import { propertiesApi, companiesApi } from '@/lib/api'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
@@ -27,6 +27,21 @@ const TYPE_BADGE_MAP: Record<string, { label: string; class: string }> = {
   PLOT: { label: 'Plot', class: 'bg-gray-100 text-gray-700' },
 }
 
+const LEASE_STATUSES = [
+  { value: 'DRAFT', label: 'Draft' },
+  { value: 'ACTIVE', label: 'Active' },
+  { value: 'EXPIRED', label: 'Expired' },
+  { value: 'TERMINATED', label: 'Terminated' },
+  { value: 'RENEWED', label: 'Renewed' },
+  { value: 'UNDER_REVIEW', label: 'Under Review' },
+]
+
+const RENT_FREQUENCIES = [
+  { value: 'monthly', label: 'Monthly' },
+  { value: 'quarterly', label: 'Quarterly' },
+  { value: 'annual', label: 'Annual' },
+]
+
 export function PropertiesPage() {
   const [companies, setCompanies] = useState<any[]>([])
 
@@ -47,24 +62,35 @@ export function PropertiesPage() {
           label: 'Type',
           render: (v: any) => <StatusBadge status={v} map={TYPE_BADGE_MAP} />
         },
-        { key: 'totalArea', label: 'Area (sqft)', render: (v: any) => v ? v.toLocaleString() : '-' },
+        { key: 'leaseNumber', label: 'Lease #', render: (v: any) => v ? <span className="font-mono text-xs">{v}</span> : '-' },
+        { key: 'leaseEndDate', label: 'Lease End', render: (v: any) => v ? formatDate(v) : '-' },
+        { key: 'rentAmount', label: 'Annual Rent', render: (v: any) => v ? `AED ${v.toLocaleString()}` : '-' },
+        {
+          key: 'leaseStatus',
+          label: 'Lease Status',
+          render: (v: any) => v ? <StatusBadge status={v} map={LEASE_STATUS_MAP} /> : '-'
+        },
         { key: 'company', label: 'Company', render: (_: any, row: any) => row.company?.name || '-' },
         { key: 'unitCount', label: 'Units', render: (v: any) => v || 0 },
-        {
-          key: 'isActive',
-          label: 'Status',
-          render: (v: any) => <Badge className={v ? 'bg-emerald-100 text-emerald-700 border-0' : 'bg-red-100 text-red-700 border-0'}>{v ? 'Active' : 'Inactive'}</Badge>
-        },
       ]}
       filterOptions={[
         {
           key: 'propertyType',
           label: 'Type',
           options: PROPERTY_TYPES
+        },
+        {
+          key: 'leaseStatus',
+          label: 'Lease Status',
+          options: LEASE_STATUSES
         }
       ]}
       renderForm={(data, setData) => (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="col-span-2">
+            <h3 className="font-semibold text-gray-800 text-sm border-b pb-1">Property Information</h3>
+          </div>
+          
           <FormField label="Property Name">
             <Input value={data.name || ''} onChange={e => setData({...data, name: e.target.value})} placeholder="Enter property name" />
           </FormField>
@@ -121,9 +147,96 @@ export function PropertiesPage() {
               <span className="text-sm text-gray-500">{data.isActive !== false ? 'Active' : 'Inactive'}</span>
             </div>
           </FormField>
+
+          {/* Merged Lease Section */}
+          <div className="col-span-2 border-t pt-4 mt-2">
+            <h3 className="font-semibold text-gray-800 text-sm border-b pb-1">Main Lease Information</h3>
+          </div>
+
+          <FormField label="Contract No">
+            <Input type="number" value={data.contractNo || ''} onChange={e => setData({...data, contractNo: parseInt(e.target.value) || undefined})} placeholder="DREC Contract #" />
+          </FormField>
+          <FormField label="Lease Number">
+            <Input value={data.leaseNumber || ''} onChange={e => setData({...data, leaseNumber: e.target.value})} placeholder="ML-YYYY-NNN" />
+          </FormField>
+          <FormField label="Lease Status">
+            <Select value={data.leaseStatus || 'DRAFT'} onValueChange={v => setData({...data, leaseStatus: v})}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                {LEASE_STATUSES.map(s => <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>)}
+              </SelectContent>
+            </Select>
+          </FormField>
+          <FormField label="Tenant Number">
+            <Input value={data.tenantNumber || ''} onChange={e => setData({...data, tenantNumber: e.target.value})} placeholder="DREC Tenant #" />
+          </FormField>
+          <FormField label="Land Number">
+            <Input value={data.landNumber || ''} onChange={e => setData({...data, landNumber: e.target.value})} placeholder="DREC Land #" />
+          </FormField>
+          <FormField label="Location">
+            <Input value={data.location || ''} onChange={e => setData({...data, location: e.target.value})} placeholder="Location area" />
+          </FormField>
+          <FormField label="Lease Start Date">
+            <Input type="date" value={data.leaseStartDate ? data.leaseStartDate.split('T')[0] : ''} onChange={e => setData({...data, leaseStartDate: e.target.value})} />
+          </FormField>
+          <FormField label="Lease End Date">
+            <Input type="date" value={data.leaseEndDate ? data.leaseEndDate.split('T')[0] : ''} onChange={e => setData({...data, leaseEndDate: e.target.value})} />
+          </FormField>
+          <FormField label="Rent Amount (AED)">
+            <Input type="number" value={data.rentAmount || ''} onChange={e => setData({...data, rentAmount: parseFloat(e.target.value) || 0})} />
+          </FormField>
+          <FormField label="Annual Rent/Sq.Ft (AED)">
+            <Input type="number" value={data.annualRentPerSqFt || ''} onChange={e => setData({...data, annualRentPerSqFt: parseFloat(e.target.value) || undefined})} />
+          </FormField>
+          <FormField label="Rent Frequency">
+            <Select value={data.rentFrequency || 'annual'} onValueChange={v => setData({...data, rentFrequency: v})}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                {RENT_FREQUENCIES.map(f => <SelectItem key={f.value} value={f.value}>{f.label}</SelectItem>)}
+              </SelectContent>
+            </Select>
+          </FormField>
+          <FormField label="Security Deposit (AED)">
+            <Input type="number" value={data.securityDeposit || ''} onChange={e => setData({...data, securityDeposit: parseFloat(e.target.value) || 0})} />
+          </FormField>
+          <FormField label="Increment %">
+            <Input type="number" value={data.incrementPercent || ''} onChange={e => setData({...data, incrementPercent: parseFloat(e.target.value) || undefined})} />
+          </FormField>
+          <FormField label="Increment Freq (Years)">
+            <Input type="number" value={data.incrementFrequency || ''} onChange={e => setData({...data, incrementFrequency: parseInt(e.target.value) || undefined})} />
+          </FormField>
+          <FormField label="Landlord Name">
+            <Input value={data.landlordName || ''} onChange={e => setData({...data, landlordName: e.target.value})} />
+          </FormField>
+          <FormField label="Landlord Contact">
+            <Input value={data.landlordContact || ''} onChange={e => setData({...data, landlordContact: e.target.value})} />
+          </FormField>
+          <FormField label="Landlord Email">
+            <Input type="email" value={data.landlordEmail || ''} onChange={e => setData({...data, landlordEmail: e.target.value})} />
+          </FormField>
+          <div className="col-span-2">
+            <FormField label="Terms (JSON)">
+              <Textarea value={data.terms || ''} onChange={e => setData({...data, terms: e.target.value})} rows={2} />
+            </FormField>
+          </div>
+          <div className="col-span-2">
+            <FormField label="Notes">
+              <Textarea value={data.notes || ''} onChange={e => setData({...data, notes: e.target.value})} rows={2} />
+            </FormField>
+          </div>
         </div>
       )}
-      defaultData={() => ({ name: '', propertyCode: '', propertyType: 'WAREHOUSE', city: 'Dubai', country: 'UAE', isActive: true })}
+      defaultData={() => ({ 
+        name: '', 
+        propertyCode: '', 
+        propertyType: 'WAREHOUSE', 
+        city: 'Dubai', 
+        country: 'UAE', 
+        isActive: true,
+        landlordName: 'DREC Properties',
+        leaseStatus: 'DRAFT',
+        rentFrequency: 'annual'
+      })}
     />
   )
 }

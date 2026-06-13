@@ -47,8 +47,8 @@ export async function GET() {
       }),
 
       // Active leases
-      db.mainLease.count({
-        where: { deletedAt: null, isActive: true, status: 'ACTIVE' },
+      db.property.count({
+        where: { deletedAt: null, isActive: true, leaseStatus: 'ACTIVE' },
       }),
 
       // Active subleases
@@ -57,19 +57,18 @@ export async function GET() {
       }),
 
       // Expiring leases (next 90 days)
-      db.mainLease.findMany({
+      db.property.findMany({
         where: {
           deletedAt: null,
           isActive: true,
-          status: 'ACTIVE',
-          endDate: { lte: ninetyDaysFromNow, gte: now },
+          leaseStatus: 'ACTIVE',
+          leaseEndDate: { lte: ninetyDaysFromNow, gte: now },
         },
         include: {
-          property: { select: { name: true } },
           company: { select: { name: true } },
         },
         take: 10,
-        orderBy: { endDate: 'asc' },
+        orderBy: { leaseEndDate: 'asc' },
       }),
 
       // Expiring EJARI (next 90 days)
@@ -206,13 +205,24 @@ export async function GET() {
       expiringLeasesCount: expiringLeases.length,
     };
 
+    const formattedExpiringLeases = expiringLeases.map(p => ({
+      id: p.id,
+      leaseNumber: p.leaseNumber,
+      contractNo: p.contractNo,
+      startDate: p.leaseStartDate,
+      endDate: p.leaseEndDate,
+      property: { name: p.name },
+      company: p.company,
+      status: p.leaseStatus,
+    }));
+
     return NextResponse.json({
       kpis,
       occupancyByPropertyType: occupancyByType,
       monthlyRevenue,
       unitStatusDistribution: unitStatusData,
       recentComplianceAlerts,
-      expiringLeases,
+      expiringLeases: formattedExpiringLeases,
       expiringEjari,
     });
   } catch (error) {

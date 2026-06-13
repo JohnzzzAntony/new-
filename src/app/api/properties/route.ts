@@ -12,6 +12,7 @@ export async function GET(request: NextRequest) {
     const propertyType = searchParams.get('propertyType');
     const companyId = searchParams.get('companyId');
     const isActive = searchParams.get('isActive');
+    const leaseStatus = searchParams.get('leaseStatus') || searchParams.get('status');
     const sortBy = searchParams.get('sortBy') || 'createdAt';
     const sortOrder = searchParams.get('sortOrder') || 'desc';
 
@@ -22,13 +23,25 @@ export async function GET(request: NextRequest) {
     };
 
     if (search) {
-      where.OR = [
+      const orConditions: Record<string, unknown>[] = [
         { name: { contains: search } },
         { propertyCode: { contains: search } },
         { address: { contains: search } },
         { area: { contains: search } },
         { city: { contains: search } },
+        { leaseNumber: { contains: search } },
+        { landlordName: { contains: search } },
+        { landlordEmail: { contains: search } },
+        { tenantNumber: { contains: search } },
+        { landNumber: { contains: search } },
+        { location: { contains: search } },
+        { notes: { contains: search } },
       ];
+      const searchAsNum = parseInt(search);
+      if (!isNaN(searchAsNum)) {
+        orConditions.push({ contractNo: searchAsNum });
+      }
+      where.OR = orConditions;
     }
 
     if (propertyType) {
@@ -37,6 +50,10 @@ export async function GET(request: NextRequest) {
 
     if (companyId) {
       where.companyId = companyId;
+    }
+
+    if (leaseStatus) {
+      where.leaseStatus = leaseStatus;
     }
 
     if (isActive !== null && isActive !== undefined && isActive !== '') {
@@ -114,6 +131,28 @@ export async function POST(request: NextRequest) {
         yearBuilt: body.yearBuilt ? parseInt(body.yearBuilt) : null,
         companyId: body.companyId,
         isActive: body.isActive ?? true,
+        // Merged lease fields:
+        contractNo: body.contractNo ? parseInt(body.contractNo) : null,
+        leaseNumber: body.leaseNumber || null,
+        leaseStartDate: body.leaseStartDate ? new Date(body.leaseStartDate) : null,
+        leaseEndDate: body.leaseEndDate ? new Date(body.leaseEndDate) : null,
+        rentAmount: body.rentAmount ? parseFloat(body.rentAmount) : null,
+        rentFrequency: body.rentFrequency || 'annual',
+        securityDeposit: body.securityDeposit ? parseFloat(body.securityDeposit) : null,
+        incrementPercent: body.incrementPercent ? parseFloat(body.incrementPercent) : null,
+        incrementFrequency: body.incrementFrequency ? parseInt(body.incrementFrequency) : null,
+        landlordName: body.landlordName || 'DREC Properties',
+        landlordContact: body.landlordContact || null,
+        landlordEmail: body.landlordEmail || null,
+        tenantNumber: body.tenantNumber || null,
+        landNumber: body.landNumber || null,
+        annualRentPerSqFt: body.annualRentPerSqFt ? parseFloat(body.annualRentPerSqFt) : null,
+        location: body.location || null,
+        terms: body.terms || null,
+        notes: body.notes || null,
+        leaseStatus: body.leaseStatus || 'DRAFT',
+        renewalStatus: body.renewalStatus || 'NONE',
+        renewedFromId: body.renewedFromId || null,
       },
       include: {
         company: {
@@ -178,6 +217,28 @@ export async function PUT(request: NextRequest) {
     if (body.yearBuilt !== undefined) updateData.yearBuilt = body.yearBuilt !== null && body.yearBuilt !== '' ? parseInt(body.yearBuilt) : null;
     if (body.companyId !== undefined) updateData.companyId = body.companyId;
     if (body.isActive !== undefined) updateData.isActive = body.isActive;
+    // Merged lease fields:
+    if (body.contractNo !== undefined) updateData.contractNo = body.contractNo !== null && body.contractNo !== '' ? parseInt(body.contractNo) : null;
+    if (body.leaseNumber !== undefined) updateData.leaseNumber = body.leaseNumber || null;
+    if (body.leaseStartDate !== undefined) updateData.leaseStartDate = body.leaseStartDate ? new Date(body.leaseStartDate) : null;
+    if (body.leaseEndDate !== undefined) updateData.leaseEndDate = body.leaseEndDate ? new Date(body.leaseEndDate) : null;
+    if (body.rentAmount !== undefined) updateData.rentAmount = body.rentAmount !== null && body.rentAmount !== '' ? parseFloat(body.rentAmount) : null;
+    if (body.rentFrequency !== undefined) updateData.rentFrequency = body.rentFrequency || 'annual';
+    if (body.securityDeposit !== undefined) updateData.securityDeposit = body.securityDeposit !== null && body.securityDeposit !== '' ? parseFloat(body.securityDeposit) : null;
+    if (body.incrementPercent !== undefined) updateData.incrementPercent = body.incrementPercent !== null && body.incrementPercent !== '' ? parseFloat(body.incrementPercent) : null;
+    if (body.incrementFrequency !== undefined) updateData.incrementFrequency = body.incrementFrequency !== null && body.incrementFrequency !== '' ? parseInt(body.incrementFrequency) : null;
+    if (body.landlordName !== undefined) updateData.landlordName = body.landlordName || 'DREC Properties';
+    if (body.landlordContact !== undefined) updateData.landlordContact = body.landlordContact || null;
+    if (body.landlordEmail !== undefined) updateData.landlordEmail = body.landlordEmail || null;
+    if (body.tenantNumber !== undefined) updateData.tenantNumber = body.tenantNumber || null;
+    if (body.landNumber !== undefined) updateData.landNumber = body.landNumber || null;
+    if (body.annualRentPerSqFt !== undefined) updateData.annualRentPerSqFt = body.annualRentPerSqFt !== null && body.annualRentPerSqFt !== '' ? parseFloat(body.annualRentPerSqFt) : null;
+    if (body.location !== undefined) updateData.location = body.location || null;
+    if (body.terms !== undefined) updateData.terms = body.terms || null;
+    if (body.notes !== undefined) updateData.notes = body.notes || null;
+    if (body.leaseStatus !== undefined) updateData.leaseStatus = body.leaseStatus || 'DRAFT';
+    if (body.renewalStatus !== undefined) updateData.renewalStatus = body.renewalStatus || 'NONE';
+    if (body.renewedFromId !== undefined) updateData.renewedFromId = body.renewedFromId || null;
 
     const property = await db.property.update({
       where: { id },

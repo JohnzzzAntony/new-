@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useCallback } from 'react'
 import { useAppStore } from '@/lib/store'
-import { propertiesApi, mainLeasesApi, unitsApi, companiesApi } from '@/lib/api'
+import { propertiesApi, unitsApi, companiesApi } from '@/lib/api'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -88,23 +88,33 @@ export function PropertyDetailPage() {
     if (!detailId) return
     setLoading(true)
     try {
-      const [propRes, leasesRes, unitsRes] = await Promise.all([
+      const [propRes, unitsRes] = await Promise.all([
         propertiesApi.get(detailId),
-        mainLeasesApi.list({ propertyId: detailId, pageSize: 1, sortBy: 'createdAt', sortOrder: 'asc' }),
         unitsApi.list({ propertyId: detailId, pageSize: 200 }),
       ])
       const propData = (propRes as any)?.data || propRes
       setProperty(propData)
-      const leaseList = (leasesRes as any)?.data || []
-      if (leaseList.length > 0) {
-        setMainLease(leaseList[0])
-        const allLeasesRes = await mainLeasesApi.list({ propertyId: detailId, pageSize: 100 })
-        setRenewals((allLeasesRes as any)?.data || [])
+      setUnits((unitsRes as any)?.data || [])
+
+      if (propData && propData.contractNo) {
+        const leaseObj = {
+          ...propData,
+          startDate: propData.leaseStartDate,
+          endDate: propData.leaseEndDate,
+          status: propData.leaseStatus,
+        }
+        setMainLease(leaseObj)
+        const renewalList = (propData.renewals || []).map((r: any) => ({
+          ...r,
+          startDate: r.leaseStartDate,
+          endDate: r.leaseEndDate,
+          status: r.leaseStatus,
+        }))
+        setRenewals(renewalList)
       } else {
         setMainLease(null)
         setRenewals([])
       }
-      setUnits((unitsRes as any)?.data || [])
     } catch (err) {
       console.error('PropertyDetail load error:', err)
     } finally {
@@ -184,13 +194,13 @@ export function PropertyDetailPage() {
       const payload = {
         contractNo: parseInt(leaseForm.contractNo) || 0,
         leaseNumber: leaseForm.leaseNumber || null,
-        status: leaseForm.status || 'DRAFT',
+        leaseStatus: leaseForm.status || 'DRAFT',
         companyId: leaseForm.companyId || null,
         tenantNumber: leaseForm.tenantNumber || null,
         landNumber: leaseForm.landNumber || null,
         location: leaseForm.location || null,
-        startDate: leaseForm.startDate ? new Date(leaseForm.startDate).toISOString() : null,
-        endDate: leaseForm.endDate ? new Date(leaseForm.endDate).toISOString() : null,
+        leaseStartDate: leaseForm.startDate ? new Date(leaseForm.startDate).toISOString() : null,
+        leaseEndDate: leaseForm.endDate ? new Date(leaseForm.endDate).toISOString() : null,
         rentAmount: parseFloat(leaseForm.rentAmount) || 0,
         annualRentPerSqFt: leaseForm.annualRentPerSqFt ? parseFloat(leaseForm.annualRentPerSqFt) : null,
         rentFrequency: leaseForm.rentFrequency || 'annual',
@@ -204,23 +214,9 @@ export function PropertyDetailPage() {
         notes: leaseForm.notes || null,
       }
 
-      if (isEditingLease) {
-        // Strip out Prisma auto-relation models
-        const { id, property, company, documents, rentCollections, complianceAlerts, renewedFrom, renewals, ...cleanPayload } = leaseForm as any
-        const updatePayload = {
-          ...payload,
-          companyId: cleanPayload.companyId || null
-        }
-        await mainLeasesApi.update(mainLease.id, updatePayload)
-        setIsEditingLease(false)
-      } else {
-        await mainLeasesApi.create({
-          ...payload,
-          propertyId: detailId,
-          isActive: true
-        })
-        setIsAddingLease(false)
-      }
+      await propertiesApi.update(detailId!, payload)
+      setIsEditingLease(false)
+      setIsAddingLease(false)
       loadAll()
     } catch (err: any) {
       alert(err.message || 'Save lease failed')
@@ -492,7 +488,7 @@ export function PropertyDetailPage() {
                     <InfoRow label="Land No." value={mainLease.landNumber} />
                     <InfoRow label="Plot No." value={property.plotNumber} />
                     <InfoRow label="Location" value={mainLease.location || property.area || property.city} />
-                    <InfoRow label="Company (Main Tenant)" value={mainLease.company?.name} />
+                    <InfoRow label="Company (Main Tenant)" value={property.company?.name} />
                     <InfoRow label="Lease From" value={formatDate(mainLease.startDate)} />
                     <InfoRow label="Lease To" value={formatDate(mainLease.endDate)} />
                     <InfoRow label="Annual Rent" value={formatCurrency(mainLease.rentAmount)} />
@@ -508,7 +504,7 @@ export function PropertyDetailPage() {
               </Card>
 
               {/* Renewal History */}
-              {renewals.length > 1 && (
+              {renewals.length > 0 && (
                 <Card className="border-0 shadow-sm">
                   <CardHeader className="pb-2">
                     <CardTitle className="text-base font-semibold text-gray-700 flex items-center gap-2">
@@ -530,7 +526,7 @@ export function PropertyDetailPage() {
                         </thead>
                         <tbody>
                           {renewals.map((lease, i) => (
-                            <tr key={lease.id} className={`border-b last:border-0 ${i === renewals.length - 1 ? 'bg-emerald-50/40' : ''}`}>
+                            <tr key={lease.id} className="border-b last:border-0 hover:bg-gray-50/50">
                               <td className="py-2 px-4 font-mono">#{lease.contractNo}</td>
                               <td className="py-2 px-4">{lease.leaseNumber}</td>
                               <td className="py-2 px-4">{formatDate(lease.startDate)}</td>

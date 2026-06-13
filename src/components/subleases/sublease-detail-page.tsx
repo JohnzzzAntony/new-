@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useCallback } from 'react'
 import { useAppStore } from '@/lib/store'
-import { subleasesApi, propertiesApi, unitsApi, subtenantsApi, mainLeasesApi, subleaseStagesApi, subleaseContractApi } from '@/lib/api'
+import { subleasesApi, propertiesApi, unitsApi, subtenantsApi, subleaseStagesApi, subleaseContractApi } from '@/lib/api'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -53,8 +53,8 @@ function FieldDisplay({ label, value }: { label: string; value: React.ReactNode 
 // ─── Contract Print Template ──────────────────────────────────────────────────
 function openContractPrintWindow(data: any) {
   const sl = data
-  const property = sl.mainLease?.property
-  const company = sl.mainLease?.company
+  const property = sl.property
+  const company = sl.property?.company
   const unit = sl.unit
   const subtenant = sl.subtenant
   const pdcDates: string[] = sl.pdcDates ? JSON.parse(sl.pdcDates) : []
@@ -97,7 +97,7 @@ function openContractPrintWindow(data: any) {
     <div class="info-row"><span class="info-label">Unit / Premises</span><span class="info-value">${unit?.unitNumber || '—'} ${unit?.unitCode ? '(' + unit.unitCode + ')' : ''}</span></div>
     <div class="info-row"><span class="info-label">Area</span><span class="info-value">${unit?.area ? unit.area.toLocaleString() + ' sqft' : '—'}</span></div>
     <div class="info-row"><span class="info-label">Main Tenant</span><span class="info-value">${company?.name || '—'}</span></div>
-    <div class="info-row"><span class="info-label">Contract No. (Main)</span><span class="info-value">${sl.mainLease?.contractNo || '—'}</span></div>
+    <div class="info-row"><span class="info-label">Contract No. (Main)</span><span class="info-value">${property?.contractNo || '—'}</span></div>
   </div>
 
   <h2>2. Sub-Tenant Details</h2>
@@ -277,7 +277,6 @@ export function SubleaseDetailPage() {
   const [properties, setProperties] = useState<any[]>([])
   const [allUnits, setAllUnits] = useState<any[]>([])
   const [subtenants, setSubtenants] = useState<any[]>([])
-  const [mainLeases, setMainLeases] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [stageSaving, setStageSaving] = useState(false)
@@ -317,18 +316,16 @@ export function SubleaseDetailPage() {
     // Load reference data for selects
     propertiesApi.list({ pageSize: 100, isActive: 'true' }).then(r => setProperties((r as any).data || [])).catch(() => {})
     subtenantsApi.list({ pageSize: 100, isActive: 'true' }).then(r => setSubtenants((r as any).data || [])).catch(() => {})
-    mainLeasesApi.list({ pageSize: 100 }).then(r => setMainLeases((r as any).data || [])).catch(() => {})
   }, [loadSublease])
 
-  // When form.mainLeaseId changes, load units for that property
-  const selectedMainLease = mainLeases.find((l: any) => l.id === form.mainLeaseId)
+  // When form.propertyId changes, load units for that property
   useEffect(() => {
-    if (selectedMainLease?.propertyId) {
-      unitsApi.list({ propertyId: selectedMainLease.propertyId, pageSize: 200 })
+    if (form.propertyId) {
+      unitsApi.list({ propertyId: form.propertyId, pageSize: 200 })
         .then(r => setAllUnits((r as any).data || []))
         .catch(() => {})
     }
-  }, [selectedMainLease?.propertyId])
+  }, [form.propertyId])
 
   // Auto-calc contract value
   const contractValue = calcContractValue(
@@ -341,7 +338,6 @@ export function SubleaseDetailPage() {
 
   // Auto-fill unit info when unit selected
   const handleUnitChange = (unitId: string) => {
-    const unit = allUnits.find((u: any) => u.id === unitId)
     handleFormChange('unitId', unitId)
   }
 
@@ -409,7 +405,7 @@ export function SubleaseDetailPage() {
 
   const selectedUnit = allUnits.find((u: any) => u.id === form.unitId)
   const selectedSubtenant = subtenants.find((s: any) => s.id === form.subtenantId)
-  const selectedProperty = properties.find((p: any) => p.id === selectedMainLease?.propertyId)
+  const selectedProperty = properties.find((p: any) => p.id === form.propertyId)
 
   // Pipeline logic
   const getStageData = (key: string) => stages.find((s: any) => s.stage === key)
@@ -455,7 +451,7 @@ export function SubleaseDetailPage() {
             <div>
               <h1 className="text-2xl font-bold text-gray-900">{sublease.subleaseNumber}</h1>
               <p className="text-sm text-gray-500">
-                {sublease.subtenant?.name} — {sublease.unit?.unitNumber} — {sublease.mainLease?.property?.name}
+                {sublease.subtenant?.name} — {sublease.unit?.unitNumber} — {sublease.property?.name}
               </p>
             </div>
           </div>
@@ -490,23 +486,23 @@ export function SubleaseDetailPage() {
               <CardTitle className="text-base font-semibold text-gray-700">Parties & Premises</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {/* Main Lease (Property) */}
+              {/* Property Selection */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label className="text-xs text-gray-500 uppercase tracking-wide">Main Lease / Property</Label>
+                  <Label className="text-xs text-gray-500 uppercase tracking-wide">Property</Label>
                   {isEditing ? (
-                    <Select value={form.mainLeaseId || ''} onValueChange={v => handleFormChange('mainLeaseId', v)}>
-                      <SelectTrigger className="mt-1"><SelectValue placeholder="Select main lease" /></SelectTrigger>
+                    <Select value={form.propertyId || ''} onValueChange={v => handleFormChange('propertyId', v)}>
+                      <SelectTrigger className="mt-1"><SelectValue placeholder="Select property" /></SelectTrigger>
                       <SelectContent>
-                        {mainLeases.map((l: any) => (
-                          <SelectItem key={l.id} value={l.id}>#{l.contractNo} — {l.property?.name}</SelectItem>
+                        {properties.map((p: any) => (
+                          <SelectItem key={p.id} value={p.id}>{p.name} {p.leaseNumber ? `(${p.leaseNumber})` : ''}</SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
                   ) : (
                     <div className="mt-1 p-2.5 bg-gray-50 rounded-lg flex items-center gap-2">
                       <Building2 className="w-4 h-4 text-gray-400" />
-                      <span className="text-sm font-medium">{sublease.mainLease?.property?.name || '—'}</span>
+                      <span className="text-sm font-medium">{sublease.property?.name || '—'}</span>
                     </div>
                   )}
                 </div>

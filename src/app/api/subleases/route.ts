@@ -17,6 +17,7 @@ const SUBLEASE_INCLUDE = {
       leaseStartDate: true,
       leaseEndDate: true,
       rentAmount: true,
+      company: { select: { id: true, name: true } },
     },
   },
   unit: {

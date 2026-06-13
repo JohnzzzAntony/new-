@@ -6,6 +6,30 @@ export const dynamic = 'force-dynamic';
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
+    const id = searchParams.get('id');
+
+    if (id) {
+      const property = await db.property.findFirst({
+        where: { id, deletedAt: null },
+        include: {
+          company: {
+            select: { id: true, name: true },
+          },
+          renewals: {
+            where: { deletedAt: null },
+            orderBy: { leaseStartDate: 'asc' },
+          },
+          _count: {
+            select: { units: { where: { deletedAt: null } } },
+          },
+        },
+      });
+      if (!property) {
+        return NextResponse.json({ error: 'Property not found' }, { status: 404 });
+      }
+      return NextResponse.json({ data: property });
+    }
+
     const page = parseInt(searchParams.get('page') || '1');
     const pageSize = parseInt(searchParams.get('pageSize') || '10');
     const search = searchParams.get('search') || '';

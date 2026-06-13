@@ -16,7 +16,6 @@ const navItems = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { id: 'companies', label: 'Companies', icon: Building2 },
   { id: 'properties', label: 'Properties', icon: Building },
-  { id: 'units', label: 'Units', icon: Box },
   { id: 'subtenants', label: 'Subtenants', icon: Users },
   { id: 'subleases', label: 'Subleases', icon: FileSignature },
   { id: 'ejari', label: 'EJARI', icon: Shield },

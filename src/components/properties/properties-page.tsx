@@ -9,6 +9,8 @@ import { Badge } from '@/components/ui/badge'
 import { Textarea } from '@/components/ui/textarea'
 import { Switch } from '@/components/ui/switch'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { UnitsPage } from '@/components/units/units-page'
 
 const PROPERTY_TYPES = [
   { value: 'WAREHOUSE', label: 'Warehouse' },
@@ -52,9 +54,18 @@ export function PropertiesPage() {
   }, [])
 
   return (
-    <ModulePage
-      title="Property"
-      api={propertiesApi}
+    <Tabs defaultValue="properties" className="w-full space-y-4">
+      <div className="flex items-center justify-between border-b pb-2">
+        <TabsList className="bg-gray-100">
+          <TabsTrigger value="properties" className="px-4 py-2">Properties</TabsTrigger>
+          <TabsTrigger value="units" className="px-4 py-2">Units</TabsTrigger>
+        </TabsList>
+      </div>
+
+      <TabsContent value="properties" className="mt-0">
+        <ModulePage
+          title="Property"
+          api={propertiesApi}
       searchPlaceholder="Search properties..."
       onRowView={(row) => setDetail('property', row.id)}
       columns={[
@@ -139,7 +150,7 @@ export function PropertiesPage() {
             </Select>
           </FormField>
           <div className="col-span-2">
-            <FormField label="Description">
+            <FormField label="Notes">
               <Textarea value={data.description || ''} onChange={e => setData({...data, description: e.target.value})} rows={2} />
             </FormField>
           </div>
@@ -162,9 +173,6 @@ export function PropertiesPage() {
           </FormField>
           <FormField label="Built-up Area (sqft)">
             <Input type="number" value={data.builtUpArea || ''} onChange={e => setData({...data, builtUpArea: parseFloat(e.target.value) || 0})} />
-          </FormField>
-          <FormField label="Year Built">
-            <Input type="number" value={data.yearBuilt || ''} onChange={e => setData({...data, yearBuilt: parseInt(e.target.value) || 0})} />
           </FormField>
           <FormField label="Active">
             <div className="flex items-center gap-2 pt-1">
@@ -262,6 +270,12 @@ export function PropertiesPage() {
         leaseStatus: 'DRAFT',
         rentFrequency: 'annual'
       })}
-    />
+        />
+      </TabsContent>
+
+      <TabsContent value="units" className="mt-0">
+        <UnitsPage />
+      </TabsContent>
+    </Tabs>
   )
 }

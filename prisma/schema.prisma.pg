@@ -65,6 +65,7 @@ model Company {
   properties     Property[]
   documents      Document[]
   subtenants     Subtenant[]
+  assets         Asset[]
 
   @@map("companies")
 }
@@ -106,6 +107,7 @@ model Property {
   plots         Plot[]
   documents     Document[]
   subleases     Sublease[]
+  assets        Asset[]
 
   contractNo         Int?               @unique
   leaseNumber        String?            @unique
@@ -568,4 +570,29 @@ model Notification {
   readAt      DateTime?
 
   @@map("notifications")
+}
+
+// ============================================
+// ASSET MANAGEMENT
+// ============================================
+
+model Asset {
+  id            String    @id @default(cuid())
+  name          String
+  assetCode     String    @unique
+  category      String    // e.g. Machinery, Furniture, HVAC
+  value         Float
+  purchaseDate  DateTime
+  status        String    @default("ACTIVE") // ACTIVE, UNDER_MAINTENANCE, RETIRED
+  notes         String?
+  companyId     String
+  propertyId    String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  deletedAt     DateTime?
+
+  company       Company   @relation(fields: [companyId], references: [id])
+  property      Property? @relation(fields: [propertyId], references: [id])
+
+  @@map("assets")
 }

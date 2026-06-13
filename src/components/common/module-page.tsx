@@ -208,7 +208,11 @@ export function ModulePage({
                   data.map((row, i) => (
                     <tr key={row.id || i} className="border-b last:border-0 hover:bg-gray-50/50 transition-colors">
                       {columns.map((col) => (
-                        <td key={col.key} className="py-3 px-4 whitespace-nowrap">
+                        <td
+                          key={col.key}
+                          className="py-3 px-4 whitespace-nowrap cursor-pointer hover:text-emerald-700 hover:bg-emerald-50/10 transition-colors"
+                          onClick={() => onRowView ? onRowView(row) : handleView(row)}
+                        >
                           {col.render ? col.render(row[col.key], row) : String(row[col.key] ?? '-')}
                         </td>
                       ))}

@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react'
 import { ModulePage, FormField, formatDate, formatCurrency, StatusBadge, LEASE_STATUS_MAP } from '@/components/common/module-page'
 import { subleasesApi, propertiesApi, unitsApi, subtenantsApi } from '@/lib/api'
+import { useAppStore } from '@/lib/store'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Switch } from '@/components/ui/switch'
@@ -27,6 +28,7 @@ export function SubleasesPage() {
   const [properties, setProperties] = useState<any[]>([])
   const [units, setUnits] = useState<any[]>([])
   const [subtenants, setSubtenants] = useState<any[]>([])
+  const { setDetail } = useAppStore()
 
   useEffect(() => {
     propertiesApi.list({ pageSize: 100, isActive: 'true' }).then(res => setProperties(res.data || [])).catch(() => {})
@@ -39,8 +41,20 @@ export function SubleasesPage() {
       title="Sublease"
       api={subleasesApi}
       searchPlaceholder="Search subleases..."
+      onRowView={(row) => setDetail('sublease', row.id)}
       columns={[
-        { key: 'subleaseNumber', label: 'Contract #', render: (v: any) => <span className="font-mono font-medium">{v}</span> },
+        {
+          key: 'subleaseNumber',
+          label: 'Contract #',
+          render: (v: any, row: any) => (
+            <button
+              onClick={() => setDetail('sublease', row.id)}
+              className="font-mono font-medium text-emerald-600 hover:text-emerald-800 hover:underline text-left bg-transparent border-0 p-0 cursor-pointer"
+            >
+              {v}
+            </button>
+          )
+        },
         { key: 'property', label: 'Property', render: (_: any, row: any) => row.property ? `${row.property.name} (${row.property.leaseNumber || 'No Lease'})` : '-' },
         { key: 'subtenant', label: 'Subtenant', render: (_: any, row: any) => row.subtenant?.name || '-' },
         { key: 'unit', label: 'Unit', render: (_: any, row: any) => row.unit?.unitNumber || '-' },

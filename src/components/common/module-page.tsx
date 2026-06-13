@@ -36,6 +36,7 @@ interface ModulePageProps {
   canCreate?: boolean
   canEdit?: boolean
   canDelete?: boolean
+  onRowView?: (row: any) => void
 }
 
 export function ModulePage({
@@ -49,6 +50,7 @@ export function ModulePage({
   canCreate = true,
   canEdit = true,
   canDelete = true,
+  onRowView,
 }: ModulePageProps) {
   const { user } = useAppStore()
   const [data, setData] = useState<any[]>([])
@@ -212,7 +214,7 @@ export function ModulePage({
                       ))}
                       <td className="py-3 px-4">
                         <div className="flex items-center justify-end gap-1">
-                          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleView(row)}>
+                          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => onRowView ? onRowView(row) : handleView(row)}>
                             <Eye className="w-4 h-4 text-gray-400" />
                           </Button>
                           {canEdit && !isReadOnly && (

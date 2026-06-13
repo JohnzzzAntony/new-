@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react'
 import { ModulePage, FormField, formatDate, StatusBadge, LEASE_STATUS_MAP } from '@/components/common/module-page'
 import { propertiesApi, companiesApi } from '@/lib/api'
+import { useAppStore } from '@/lib/store'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Textarea } from '@/components/ui/textarea'
@@ -44,6 +45,7 @@ const RENT_FREQUENCIES = [
 
 export function PropertiesPage() {
   const [companies, setCompanies] = useState<any[]>([])
+  const { setDetail } = useAppStore()
 
   useEffect(() => {
     companiesApi.list({ pageSize: 100, isActive: 'true' }).then(res => setCompanies(res.data || [])).catch(() => {})
@@ -54,9 +56,32 @@ export function PropertiesPage() {
       title="Property"
       api={propertiesApi}
       searchPlaceholder="Search properties..."
+      onRowView={(row) => setDetail('property', row.id)}
       columns={[
-        { key: 'propertyCode', label: 'Code', render: (v: any) => <span className="font-mono text-xs">{v}</span> },
-        { key: 'name', label: 'Name', render: (v: any) => <span className="font-medium">{v}</span> },
+        {
+          key: 'propertyCode',
+          label: 'Code',
+          render: (v: any, row: any) => (
+            <button
+              onClick={() => setDetail('property', row.id)}
+              className="font-mono text-xs text-emerald-600 hover:text-emerald-800 hover:underline text-left bg-transparent border-0 p-0 cursor-pointer"
+            >
+              {v}
+            </button>
+          )
+        },
+        {
+          key: 'name',
+          label: 'Name',
+          render: (v: any, row: any) => (
+            <button
+              onClick={() => setDetail('property', row.id)}
+              className="font-medium text-emerald-600 hover:text-emerald-800 hover:underline text-left bg-transparent border-0 p-0 cursor-pointer"
+            >
+              {v}
+            </button>
+          )
+        },
         {
           key: 'propertyType',
           label: 'Type',

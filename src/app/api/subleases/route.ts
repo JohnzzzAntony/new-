@@ -3,9 +3,48 @@ import { db } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
 
+const SUBLEASE_INCLUDE = {
+  property: {
+    select: {
+      id: true,
+      name: true,
+      plotNumber: true,
+      area: true,
+      totalArea: true,
+      address: true,
+      leaseNumber: true,
+      contractNo: true,
+      leaseStartDate: true,
+      leaseEndDate: true,
+      rentAmount: true,
+    },
+  },
+  unit: {
+    select: { id: true, unitNumber: true, unitCode: true, unitType: true, area: true, rentAmount: true, status: true },
+  },
+  subtenant: {
+    include: {
+      company: { select: { id: true, name: true, phone: true, email: true, contactPerson: true } },
+    },
+  },
+  stages: { orderBy: { createdAt: 'asc' as const } },
+};
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
+    const id = searchParams.get('id');
+
+    // Single record fetch
+    if (id) {
+      const sublease = await db.sublease.findFirst({
+        where: { id, deletedAt: null },
+        include: SUBLEASE_INCLUDE,
+      });
+      if (!sublease) return NextResponse.json({ error: 'Sublease not found' }, { status: 404 });
+      return NextResponse.json({ data: sublease });
+    }
+
     const page = parseInt(searchParams.get('page') || '1');
     const pageSize = parseInt(searchParams.get('pageSize') || '10');
     const search = searchParams.get('search') || '';
@@ -63,29 +102,17 @@ export async function GET(request: NextRequest) {
               name: true,
             },
           },
-          unit: {
-            select: { id: true, unitNumber: true, unitType: true, area: true, rentAmount: true },
-          },
-          subtenant: {
-            select: { id: true, name: true, tradeName: true, phone: true, email: true },
-          },
+          unit: { select: { id: true, unitNumber: true, unitType: true, area: true } },
+          subtenant: { select: { id: true, name: true, tradeName: true, phone: true, email: true } },
         },
       }),
       db.sublease.count({ where }),
     ]);
 
-    return NextResponse.json({
-      data,
-      total,
-      page,
-      pageSize,
-    });
+    return NextResponse.json({ data, total, page, pageSize });
   } catch (error) {
     console.error('Subleases GET error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
@@ -105,6 +132,9 @@ export async function POST(request: NextRequest) {
         securityDeposit: body.securityDeposit,
         incrementPercent: body.incrementPercent,
         incrementFrequency: body.incrementFrequency,
+        numberOfCheques: body.numberOfCheques ?? null,
+        pdcDates: body.pdcDates ?? null,
+        paymentNotes: body.paymentNotes ?? null,
         terms: body.terms,
         notes: body.notes,
         status: body.status || 'DRAFT',
@@ -115,22 +145,7 @@ export async function POST(request: NextRequest) {
         subtenantId: body.subtenantId,
         isActive: body.isActive ?? true,
       },
-      include: {
-        property: {
-          select: {
-            id: true,
-            leaseNumber: true,
-            contractNo: true,
-            name: true,
-          },
-        },
-        unit: {
-          select: { id: true, unitNumber: true, unitType: true, area: true, rentAmount: true },
-        },
-        subtenant: {
-          select: { id: true, name: true, tradeName: true, phone: true, email: true },
-        },
-      },
+      include: SUBLEASE_INCLUDE,
     });
 
     return NextResponse.json({ data: sublease }, { status: 201 });
@@ -138,15 +153,9 @@ export async function POST(request: NextRequest) {
     console.error('Subleases POST error:', error);
     const errMsg = error instanceof Error ? error.message : 'Internal server error';
     if (errMsg.includes('Unique')) {
-      return NextResponse.json(
-        { error: 'Sublease number already exists' },
-        { status: 409 }
-      );
+      return NextResponse.json({ error: 'Sublease number already exists' }, { status: 409 });
     }
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
@@ -155,47 +164,28 @@ export async function PUT(request: NextRequest) {
     const body = await request.json();
     const { id, ...updateData } = body;
 
-    if (!id) {
-      return NextResponse.json(
-        { error: 'Sublease ID is required' },
-        { status: 400 }
-      );
-    }
+    if (!id) return NextResponse.json({ error: 'Sublease ID is required' }, { status: 400 });
 
-    const existing = await db.sublease.findFirst({
-      where: { id, deletedAt: null },
-    });
-
-    if (!existing) {
-      return NextResponse.json(
-        { error: 'Sublease not found' },
-        { status: 404 }
-      );
-    }
+    const existing = await db.sublease.findFirst({ where: { id, deletedAt: null } });
+    if (!existing) return NextResponse.json({ error: 'Sublease not found' }, { status: 404 });
 
     const data: Record<string, unknown> = { ...updateData };
     if (updateData.startDate) data.startDate = new Date(updateData.startDate);
     if (updateData.endDate) data.endDate = new Date(updateData.endDate);
+    // Remove relation objects that Prisma cannot write directly
+    delete data.property;
+    delete data.unit;
+    delete data.subtenant;
+    delete data.stages;
+    delete data.invoices;
+    delete data.ejariRegistrations;
+    delete data.documents;
+    delete data.renewals;
 
     const sublease = await db.sublease.update({
       where: { id },
       data,
-      include: {
-        property: {
-          select: {
-            id: true,
-            leaseNumber: true,
-            contractNo: true,
-            name: true,
-          },
-        },
-        unit: {
-          select: { id: true, unitNumber: true, unitType: true, area: true, rentAmount: true },
-        },
-        subtenant: {
-          select: { id: true, name: true, tradeName: true, phone: true, email: true },
-        },
-      },
+      include: SUBLEASE_INCLUDE,
     });
 
     return NextResponse.json({ data: sublease });
@@ -203,15 +193,9 @@ export async function PUT(request: NextRequest) {
     console.error('Subleases PUT error:', error);
     const errMsg = error instanceof Error ? error.message : 'Internal server error';
     if (errMsg.includes('Unique')) {
-      return NextResponse.json(
-        { error: 'Sublease number already exists' },
-        { status: 409 }
-      );
+      return NextResponse.json({ error: 'Sublease number already exists' }, { status: 409 });
     }
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 

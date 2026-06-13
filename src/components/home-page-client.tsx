@@ -1,46 +1,31 @@
 'use client'
 
-import React, { useState, useEffect, useCallback } from 'react'
+import { useEffect, useState } from 'react'
 import { useAppStore } from '@/lib/store'
-import { LoginPage } from '@/components/login-page'
 import { AppShell } from '@/components/app-shell'
+import { LoginPage } from '@/components/login-page'
 
 export function HomePageClient() {
-  const { user, token, login, logout } = useAppStore()
-  const [loading, setLoading] = useState(true)
-
-  const restoreSession = useCallback(() => {
-    const savedToken = localStorage.getItem('pms_token')
-    const savedUser = localStorage.getItem('pms_user')
-    if (savedToken && savedUser) {
-      try {
-        const parsedUser = JSON.parse(savedUser)
-        login(parsedUser, savedToken)
-      } catch {
-        logout()
-      }
-    }
-  }, [login, logout])
+  const { token, user } = useAppStore()
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
-    restoreSession()
-    // Use a microtask to avoid calling setState synchronously in the effect
-    const timer = setTimeout(() => setLoading(false), 0)
-    return () => clearTimeout(timer)
-  }, [restoreSession])
+    setMounted(true)
+  }, [])
 
-  if (loading) {
+  // Prevent hydration mismatch by only rendering after mount
+  if (!mounted) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <div className="w-12 h-12 border-4 border-emerald-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-gray-600">Loading DREC PMS...</p>
+      <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-50 via-white to-teal-50">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-10 h-10 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+          <p className="text-sm text-gray-400 font-medium">Loading DREC PMS...</p>
         </div>
-      </div>
+      </main>
     )
   }
 
-  if (!user || !token) {
+  if (!token || !user) {
     return <LoginPage />
   }
 

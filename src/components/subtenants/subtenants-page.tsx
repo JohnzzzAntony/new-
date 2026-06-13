@@ -1,14 +1,21 @@
 'use client'
 
-import React from 'react'
-import { ModulePage, FormField, formatDate, formatCurrency } from '@/components/common/module-page'
-import { subtenantsApi } from '@/lib/api'
+import React, { useEffect, useState } from 'react'
+import { ModulePage, FormField, formatDate } from '@/components/common/module-page'
+import { subtenantsApi, companiesApi } from '@/lib/api'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Textarea } from '@/components/ui/textarea'
 import { Switch } from '@/components/ui/switch'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 export function SubtenantsPage() {
+  const [companies, setCompanies] = useState<any[]>([])
+
+  useEffect(() => {
+    companiesApi.list({ pageSize: 200, isActive: 'true' }).then(res => setCompanies(res.data || [])).catch(() => {})
+  }, [])
+
   return (
     <ModulePage
       title="Subtenant"
@@ -17,6 +24,9 @@ export function SubtenantsPage() {
       columns={[
         { key: 'name', label: 'Name', render: (v: any) => <span className="font-medium">{v}</span> },
         { key: 'tradeName', label: 'Trade Name' },
+        { key: 'company', label: 'Linked Company', render: (_: any, row: any) => row.company?.name
+          ? <Badge className="bg-blue-100 text-blue-700 border-0 text-xs">{row.company.name}</Badge>
+          : <span className="text-gray-400 text-xs">—</span> },
         { key: 'contactPerson', label: 'Contact' },
         { key: 'phone', label: 'Phone' },
         { key: 'email', label: 'Email' },
@@ -43,6 +53,17 @@ export function SubtenantsPage() {
           <FormField label="Trade Name">
             <Input value={data.tradeName || ''} onChange={e => setData({...data, tradeName: e.target.value})} />
           </FormField>
+          <div className="col-span-2">
+            <FormField label="Linked Company (Optional — subtenant is always a company)">
+              <Select value={data.companyId || 'none'} onValueChange={v => setData({...data, companyId: v === 'none' ? null : v})}>
+                <SelectTrigger><SelectValue placeholder="Link to existing Company record (optional)" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">— Not linked —</SelectItem>
+                  {companies.map(c => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </FormField>
+          </div>
           <FormField label="Trade License No">
             <Input value={data.tradeLicenseNo || ''} onChange={e => setData({...data, tradeLicenseNo: e.target.value})} />
           </FormField>

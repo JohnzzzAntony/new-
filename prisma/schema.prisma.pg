@@ -44,7 +44,7 @@ model Company {
   id              String   @id @default(cuid())
   name            String
   tradeName       String?
-  registrationNo  String?  @unique
+  registrationNo  String?
   tradeLicenseNo  String?
   tradeLicenseExpiry DateTime?
   address         String?
@@ -63,8 +63,8 @@ model Company {
   deletedAt       DateTime?
 
   properties     Property[]
-  mainLeases     MainLease[]
   documents      Document[]
+  subtenants     Subtenant[]
 
   @@map("companies")
 }
@@ -104,8 +104,33 @@ model Property {
   company       Company      @relation(fields: [companyId], references: [id])
   units         Unit[]
   plots         Plot[]
-  mainLeases    MainLease[]
   documents     Document[]
+  subleases     Sublease[]
+
+  contractNo         Int?               @unique
+  leaseNumber        String?            @unique
+  leaseStartDate     DateTime?
+  leaseEndDate       DateTime?
+  rentAmount         Float?
+  rentFrequency      String?            @default("annual") // monthly, quarterly, annual
+  securityDeposit    Float?
+  incrementPercent   Float?            // annual increment %
+  incrementFrequency Int?            // every N years
+  landlordName       String?            @default("DREC Properties")
+  landlordContact    String?
+  landlordEmail      String?
+  tenantNumber       String?           // DREC tenant number
+  landNumber         String?           // DREC land number
+  annualRentPerSqFt  Float?           // Annual rent per sq ft
+  location           String?           // Location area
+  terms              String?           // JSON of terms
+  notes              String?
+  leaseStatus        LeaseStatus?       @default(DRAFT)
+  renewalStatus      LeaseRenewalStatus? @default(NONE)
+  renewedFromId      String?
+
+  renewedFrom        Property?          @relation("PropertyLeaseRenewals", fields: [renewedFromId], references: [id])
+  renewals           Property[]         @relation("PropertyLeaseRenewals")
 
   @@map("properties")
 }
@@ -197,45 +222,7 @@ enum LeaseRenewalStatus {
   REJECTED
 }
 
-model MainLease {
-  id               String            @id @default(cuid())
-  contractNo       Int               @unique
-  leaseNumber      String            @unique
-  startDate        DateTime
-  endDate          DateTime
-  rentAmount       Float
-  rentFrequency    String            @default("annual") // monthly, quarterly, annual
-  securityDeposit  Float?
-  incrementPercent Float?            // annual increment %
-  incrementFrequency Int?            // every N years
-  landlordName     String
-  landlordContact  String?
-  landlordEmail    String?
-  tenantNumber     String?           // DREC tenant number
-  landNumber       String?           // DREC land number
-  annualRentPerSqFt Float?           // Annual rent per sq ft
-  location         String?           // Location area
-  terms            String?           // JSON of terms
-  notes            String?
-  status           LeaseStatus       @default(DRAFT)
-  renewalStatus    LeaseRenewalStatus @default(NONE)
-  renewedFromId    String?
-  propertyId       String
-  companyId        String
-  isActive         Boolean           @default(true)
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime          @updatedAt
-  deletedAt        DateTime?
-
-  property         Property          @relation(fields: [propertyId], references: [id])
-  company          Company           @relation(fields: [companyId], references: [id])
-  renewedFrom      MainLease?        @relation("LeaseRenewals", fields: [renewedFromId], references: [id])
-  renewals         MainLease[]       @relation("LeaseRenewals")
-  subleases        Sublease[]
-  documents        Document[]
-
-  @@map("main_leases")
-}
+// MainLease removed and merged into Property
 
 // ============================================
 // SUBTENANT MANAGEMENT
@@ -258,11 +245,13 @@ model Subtenant {
   emiratesId        String?
   passportNo        String?
   notes             String?
+  companyId         String?  // optional link to Company record
   isActive          Boolean  @default(true)
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
   deletedAt         DateTime?
 
+  company           Company?  @relation(fields: [companyId], references: [id])
   subleases         Sublease[]
   ejariRegistrations Ejari[]
   documents         Document[]
@@ -295,12 +284,15 @@ model Sublease {
   securityDeposit  Float?
   incrementPercent Float?
   incrementFrequency Int?
+  numberOfCheques  Int?            // mode of payment: number of PDC cheques
+  pdcDates         String?         // JSON array of post-dated cheque date strings
+  paymentNotes     String?         // notes on payment arrangement
   terms            String?
   notes            String?
   status           SubleaseStatus  @default(DRAFT)
   renewalStatus    LeaseRenewalStatus @default(NONE)
   renewedFromId    String?
-  mainLeaseId      String
+  propertyId       String
   unitId           String
   subtenantId      String
   isActive         Boolean         @default(true)
@@ -308,7 +300,7 @@ model Sublease {
   updatedAt        DateTime        @updatedAt
   deletedAt        DateTime?
 
-  mainLease        MainLease       @relation(fields: [mainLeaseId], references: [id])
+  property         Property        @relation(fields: [propertyId], references: [id])
   unit             Unit            @relation(fields: [unitId], references: [id])
   subtenant        Subtenant       @relation(fields: [subtenantId], references: [id])
   renewedFrom      Sublease?       @relation("SubleaseRenewals", fields: [renewedFromId], references: [id])
@@ -316,8 +308,30 @@ model Sublease {
   invoices         Invoice[]
   ejariRegistrations Ejari[]
   documents        Document[]
+  stages           SubleaseStage[]
 
   @@map("subleases")
+}
+
+// ============================================
+// SUBLEASE PIPELINE STAGES
+// ============================================
+
+model SubleaseStage {
+  id           String    @id @default(cuid())
+  subleaseId   String
+  stage        String    // DRAFT | SENT_FOR_SIGNING | SIGNED | SUBMITTED_TO_DREC | DREC_APPROVED | EJARI_APPLIED | EJARI_REGISTERED | ACTIVE
+  completedAt  DateTime?
+  doneBy       String?
+  documentUrl  String?
+  notes        String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  sublease     Sublease  @relation(fields: [subleaseId], references: [id])
+
+  @@unique([subleaseId, stage])
+  @@map("sublease_stages")
 }
 
 // ============================================
@@ -334,7 +348,7 @@ enum EjariStatus {
 
 model Ejari {
   id                String      @id @default(cuid())
-  ejariNumber       String?     @unique
+  ejariNumber       String?
   registrationDate  DateTime?
   expiryDate        DateTime?
   certificateUrl    String?
@@ -487,7 +501,6 @@ model Document {
   companyId     String?
   propertyId    String?
   unitId        String?
-  mainLeaseId   String?
   subleaseId    String?
   ejariId       String?
   subtenantId   String?
@@ -500,7 +513,6 @@ model Document {
   company       Company?     @relation(fields: [companyId], references: [id])
   property      Property?    @relation(fields: [propertyId], references: [id])
   unit          Unit?        @relation(fields: [unitId], references: [id])
-  mainLease     MainLease?   @relation(fields: [mainLeaseId], references: [id])
   sublease      Sublease?    @relation(fields: [subleaseId], references: [id])
   ejari         Ejari?       @relation(fields: [ejariId], references: [id])
   subtenant     Subtenant?   @relation(fields: [subtenantId], references: [id])

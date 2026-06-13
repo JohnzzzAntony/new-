@@ -37,6 +37,7 @@ export async function GET(request: NextRequest) {
     const companyId = searchParams.get('companyId');
     const isActive = searchParams.get('isActive');
     const leaseStatus = searchParams.get('leaseStatus') || searchParams.get('status');
+    const expiringSoon = searchParams.get('expiringSoon');
     const sortBy = searchParams.get('sortBy') || 'createdAt';
     const sortOrder = searchParams.get('sortOrder') || 'desc';
 
@@ -45,6 +46,14 @@ export async function GET(request: NextRequest) {
     const where: Record<string, unknown> = {
       deletedAt: null,
     };
+
+    if (expiringSoon === 'true') {
+      const now = new Date();
+      const ninetyDaysFromNow = new Date(now.getTime() + 90 * 24 * 60 * 60 * 1000);
+      where.leaseEndDate = { lte: ninetyDaysFromNow, gte: now };
+      where.leaseStatus = 'ACTIVE';
+    }
+
 
     if (search) {
       const orConditions: Record<string, unknown>[] = [

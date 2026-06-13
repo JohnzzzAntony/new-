@@ -47,20 +47,21 @@ const RENT_FREQUENCIES = [
 
 export function PropertiesPage() {
   const [companies, setCompanies] = useState<any[]>([])
-  const { setDetail } = useAppStore()
+  const { setDetail, propertiesTab, setPropertiesTab } = useAppStore()
 
   useEffect(() => {
     companiesApi.list({ pageSize: 100, isActive: 'true' }).then(res => setCompanies(res.data || [])).catch(() => {})
   }, [])
 
   return (
-    <Tabs defaultValue="properties" className="w-full space-y-4">
+    <Tabs value={propertiesTab} onValueChange={(v) => setPropertiesTab(v as any)} className="w-full space-y-4">
       <div className="flex items-center justify-between border-b pb-2">
         <TabsList className="bg-gray-100">
           <TabsTrigger value="properties" className="px-4 py-2">Properties</TabsTrigger>
           <TabsTrigger value="units" className="px-4 py-2">Units</TabsTrigger>
         </TabsList>
       </div>
+
 
       <TabsContent value="properties" className="mt-0">
         <ModulePage

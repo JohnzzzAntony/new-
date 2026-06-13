@@ -101,8 +101,18 @@ export const complianceApi = {
 }
 
 export const dashboardApi = {
-  get: () => apiFetch<any>('/dashboard'),
+  get: (params?: Record<string, string>) => {
+    const searchParams = new URLSearchParams()
+    if (params) {
+      Object.entries(params).forEach(([k, v]) => {
+        if (v !== undefined && v !== '') searchParams.set(k, v)
+      })
+    }
+    const qs = searchParams.toString()
+    return apiFetch<any>(`/dashboard${qs ? `?${qs}` : ''}`)
+  },
 }
+
 
 export const reportsApi = {
   get: (type: string, format: string = 'json') =>

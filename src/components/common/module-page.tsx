@@ -52,7 +52,7 @@ export function ModulePage({
   canDelete = true,
   onRowView,
 }: ModulePageProps) {
-  const { user, searchQuery, setSearchQuery } = useAppStore()
+  const { user, searchQuery, setSearchQuery, globalFilters, setGlobalFilters } = useAppStore()
   const [data, setData] = useState<any[]>([])
   const [total, setTotal] = useState(0)
   const [page, setPage] = useState(1)
@@ -81,8 +81,17 @@ export function ModulePage({
   }, [page, pageSize, searchQuery, filters, api])
 
   useEffect(() => {
+    if (globalFilters && Object.keys(globalFilters).length > 0) {
+      setFilters(prev => ({ ...prev, ...globalFilters }))
+      setPage(1)
+      setGlobalFilters(null)
+    }
+  }, [globalFilters, setGlobalFilters])
+
+  useEffect(() => {
     loadData()
   }, [loadData])
+
 
   const handleCreate = () => {
     setFormData(defaultData())

@@ -19,6 +19,10 @@ interface AppState {
   detailType: string | null
   searchQuery: string
   setSearchQuery: (query: string) => void
+  globalFilters: Record<string, any> | null
+  setGlobalFilters: (filters: Record<string, any> | null) => void
+  propertiesTab: 'properties' | 'units'
+  setPropertiesTab: (tab: 'properties' | 'units') => void
   login: (user: User, token: string) => void
   logout: () => void
   setActiveTab: (tab: string) => void
@@ -36,6 +40,10 @@ export const useAppStore = create<AppState>((set) => ({
   detailId: null,
   detailType: null,
   searchQuery: '',
+  globalFilters: null,
+  setGlobalFilters: (filters) => set({ globalFilters: filters }),
+  propertiesTab: 'properties',
+  setPropertiesTab: (tab) => set({ propertiesTab: tab }),
   setSearchQuery: (query) => set({ searchQuery: query }),
   login: (user, token) => {
     localStorage.setItem('pms_token', token)
@@ -45,7 +53,7 @@ export const useAppStore = create<AppState>((set) => ({
   logout: () => {
     localStorage.removeItem('pms_token')
     localStorage.removeItem('pms_user')
-    set({ user: null, token: null, detailId: null, detailType: null, searchQuery: '' })
+    set({ user: null, token: null, detailId: null, detailType: null, searchQuery: '', globalFilters: null, propertiesTab: 'properties' })
   },
   setActiveTab: (tab) => set({ activeTab: tab, searchQuery: '' }),
   toggleSidebar: () => set((state) => ({ sidebarOpen: !state.sidebarOpen })),
@@ -53,3 +61,4 @@ export const useAppStore = create<AppState>((set) => ({
   setDetail: (type, id) => set({ detailType: type, detailId: id, activeTab: `${type}-detail`, searchQuery: '' }),
   clearDetail: () => set({ detailType: null, detailId: null }),
 }))
+

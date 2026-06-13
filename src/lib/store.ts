@@ -33,7 +33,14 @@ interface AppState {
 }
 
 export const useAppStore = create<AppState>((set) => ({
-  user: null,
+  user: typeof window !== 'undefined' ? (() => {
+    try {
+      const u = localStorage.getItem('pms_user')
+      return u ? JSON.parse(u) : null
+    } catch {
+      return null
+    }
+  })() : null,
   token: typeof window !== 'undefined' ? localStorage.getItem('pms_token') : null,
   activeTab: 'dashboard',
   sidebarOpen: true,

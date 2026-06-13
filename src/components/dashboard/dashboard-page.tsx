@@ -80,6 +80,11 @@ export function DashboardPage() {
   const [handledEjariNo, setHandledEjariNo] = useState('')
   const [handlingEjari, setHandlingEjari] = useState(false)
 
+  const handleSendNotice = (leaseRef: string) => {
+    setNoticeLeaseRef(leaseRef)
+    setNoticeModalOpen(true)
+  }
+
   useEffect(() => {
     // Load companies list for filter
     companiesApi.list({ pageSize: 100, isActive: 'true' })
@@ -641,7 +646,7 @@ export function DashboardPage() {
                             {ej.ejariNumber || 'Pending'}
                           </button>
                         </td>
-                        <td className="py-2.5 px-3 max-w-[120px] truncate text-gray-700">{ej.subtenant || '-'}</td>
+                        <td className="py-2.5 px-3 max-w-[120px] truncate text-gray-700">{ej.subtenant?.name || ej.subtenant?.tradeName || '-'}</td>
                         <td className="py-2.5 px-3 max-w-[150px] truncate text-gray-700">
                           {ej.sublease?.property?.name ? (
                             <button
@@ -723,15 +728,22 @@ export function DashboardPage() {
                 {sortedComplianceAlerts.map((alert: any, i: number) => {
                   const AlertIcon = COMPLIANCE_STATUS_ICONS[alert.status] || AlertTriangle
                   const colorClass = COMPLIANCE_STATUS_COLORS[alert.status] || 'bg-gray-100 text-gray-700'
+                  const getLinkType = (entType: string) => {
+                    if (!entType) return null
+                    const l = entType.toLowerCase()
+                    if (l === 'mainlease') return 'property'
+                    return l
+                  }
+                  const linkType = getLinkType(alert.entityType)
                   return (
                     <div key={i} className="flex items-start gap-2.5 p-2 bg-gray-50 rounded-lg hover:bg-gray-100/50 transition-colors text-xs">
                       <div className={`p-1.5 rounded-lg shrink-0 ${colorClass}`}>
                         <AlertIcon className="w-3.5 h-3.5" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        {alert.linkType && alert.linkId ? (
+                        {linkType && alert.entityId ? (
                           <button
-                            onClick={() => setDetail(alert.linkType, alert.linkId)}
+                            onClick={() => setDetail(linkType, alert.entityId)}
                             className="text-left font-semibold text-emerald-600 hover:text-emerald-800 hover:underline bg-transparent border-0 p-0 cursor-pointer block truncate"
                           >
                             {alert.title}

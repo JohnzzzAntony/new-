@@ -52,12 +52,11 @@ export function ModulePage({
   canDelete = true,
   onRowView,
 }: ModulePageProps) {
-  const { user } = useAppStore()
+  const { user, searchQuery, setSearchQuery } = useAppStore()
   const [data, setData] = useState<any[]>([])
   const [total, setTotal] = useState(0)
   const [page, setPage] = useState(1)
   const [pageSize] = useState(10)
-  const [search, setSearch] = useState('')
   const [filters, setFilters] = useState<Record<string, string>>({})
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
@@ -70,7 +69,7 @@ export function ModulePage({
   const loadData = useCallback(async () => {
     setLoading(true)
     try {
-      const params: any = { page, pageSize, search, ...filters }
+      const params: any = { page, pageSize, search: searchQuery, ...filters }
       const result = await api.list(params)
       setData(result.data || [])
       setTotal(result.total || 0)
@@ -79,7 +78,7 @@ export function ModulePage({
     } finally {
       setLoading(false)
     }
-  }, [page, pageSize, search, filters, api])
+  }, [page, pageSize, searchQuery, filters, api])
 
   useEffect(() => {
     loadData()
@@ -142,8 +141,8 @@ export function ModulePage({
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <Input
               placeholder={searchPlaceholder}
-              value={search}
-              onChange={(e) => { setSearch(e.target.value); setPage(1) }}
+              value={searchQuery}
+              onChange={(e) => { setSearchQuery(e.target.value); setPage(1) }}
               className="pl-9 h-9"
             />
           </div>
@@ -300,9 +299,9 @@ export function ModulePage({
               {columns.map((col) => (
                 <div key={col.key} className="space-y-1">
                   <Label className="text-xs text-gray-500">{col.label}</Label>
-                  <p className="text-sm font-medium">
+                  <div className="text-sm font-medium">
                     {col.render ? col.render(viewData[col.key], viewData) : String(viewData[col.key] ?? '-')}
-                  </p>
+                  </div>
                 </div>
               ))}
             </div>

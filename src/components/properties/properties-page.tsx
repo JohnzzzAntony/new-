@@ -111,6 +111,11 @@ export function PropertiesPage() {
       ]}
       filterOptions={[
         {
+          key: 'companyId',
+          label: 'Company',
+          options: companies.map(c => ({ value: c.id, label: c.name }))
+        },
+        {
           key: 'propertyType',
           label: 'Type',
           options: PROPERTY_TYPES

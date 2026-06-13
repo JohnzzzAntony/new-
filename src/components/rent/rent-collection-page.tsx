@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { formatDate, formatCurrency, FormField, StatusBadge, INVOICE_STATUS_MAP } from '@/components/common/module-page'
 import { Plus, Loader2, ChevronLeft, ChevronRight, Search, FileText, Receipt } from 'lucide-react'
+import { useAppStore } from '@/lib/store'
 
 const INVOICE_STATUSES = [
   { value: 'ISSUED', label: 'Issued' },
@@ -30,13 +31,13 @@ const PAYMENT_METHODS = [
 ]
 
 export function RentCollectionPage() {
+  const { searchQuery, setSearchQuery } = useAppStore()
   const [activeTab, setActiveTab] = useState('invoices')
 
   // Invoice state
   const [invoices, setInvoices] = useState<any[]>([])
   const [invoiceTotal, setInvoiceTotal] = useState(0)
   const [invoicePage, setInvoicePage] = useState(1)
-  const [invoiceSearch, setInvoiceSearch] = useState('')
   const [invoiceStatus, setInvoiceStatus] = useState('')
   const [invoiceLoading, setInvoiceLoading] = useState(true)
   const [showInvoiceForm, setShowInvoiceForm] = useState(false)
@@ -58,7 +59,7 @@ export function RentCollectionPage() {
   const loadInvoices = useCallback(async () => {
     setInvoiceLoading(true)
     try {
-      const params: any = { page: invoicePage, pageSize, search: invoiceSearch }
+      const params: any = { page: invoicePage, pageSize, search: searchQuery }
       if (invoiceStatus) params.status = invoiceStatus
       const result = await invoicesApi.list(params)
       setInvoices(result.data || [])
@@ -68,7 +69,7 @@ export function RentCollectionPage() {
     } finally {
       setInvoiceLoading(false)
     }
-  }, [invoicePage, invoiceSearch, invoiceStatus])
+  }, [invoicePage, searchQuery, invoiceStatus])
 
   const loadReceipts = useCallback(async () => {
     setReceiptLoading(true)
@@ -89,6 +90,68 @@ export function RentCollectionPage() {
 
   useEffect(() => { loadInvoices() }, [loadInvoices])
   useEffect(() => { loadReceipts() }, [loadReceipts])
+
+  const handleSubleaseChange = (subleaseId: string) => {
+    const sub = subleases.find(s => s.id === subleaseId)
+    if (!sub) return
+
+    const rent = sub.rentAmount || 0
+    const vat = Math.round((rent * 0.05) * 100) / 100 // 5% VAT in UAE
+    const total = rent + vat
+
+    const issueDateStr = new Date().toISOString().split('T')[0]
+    
+    // Default due date: 30 days from now
+    const due = new Date()
+    due.setDate(due.getDate() + 30)
+    const dueDateStr = due.toISOString().split('T')[0]
+
+    // Formatted date inputs (YYYY-MM-DD)
+    const periodStartStr = sub.startDate ? sub.startDate.split('T')[0] : ''
+    const periodEndStr = sub.endDate ? sub.endDate.split('T')[0] : ''
+
+    // Generate a clean invoice number
+    const rand = Math.floor(1000 + Math.random() * 9000)
+    const invoiceNum = `INV-${sub.subleaseNumber}-${rand}`
+
+    setInvoiceData({
+      ...invoiceData,
+      subleaseId,
+      invoiceNumber: invoiceNum,
+      issueDate: issueDateStr,
+      dueDate: dueDateStr,
+      periodStart: periodStartStr,
+      periodEnd: periodEndStr,
+      rentAmount: rent,
+      otherCharges: 0,
+      vatAmount: vat,
+      totalAmount: total,
+      balanceDue: total
+    })
+  }
+
+  const updateInvoiceField = (field: string, val: any) => {
+    setInvoiceData(prev => {
+      const updated = { ...prev, [field]: val }
+      if (['rentAmount', 'otherCharges', 'vatAmount', 'amountPaid'].includes(field)) {
+        const rent = parseFloat(updated.rentAmount) || 0
+        const other = parseFloat(updated.otherCharges) || 0
+        const vat = parseFloat(updated.vatAmount) || 0
+        const paid = parseFloat(updated.amountPaid) || 0
+        const total = Math.round((rent + other + vat) * 100) / 100
+        updated.totalAmount = total
+        updated.balanceDue = Math.round((total - paid) * 100) / 100
+      } else if (['rentAmount', 'otherCharges', 'vatAmount'].includes(field)) {
+        const rent = parseFloat(updated.rentAmount) || 0
+        const other = parseFloat(updated.otherCharges) || 0
+        const vat = parseFloat(updated.vatAmount) || 0
+        const total = Math.round((rent + other + vat) * 100) / 100
+        updated.totalAmount = total
+        updated.balanceDue = total
+      }
+      return updated
+    })
+  }
 
   const handleSaveInvoice = async () => {
     setSavingInvoice(true)
@@ -161,7 +224,7 @@ export function RentCollectionPage() {
             <div className="flex gap-2 flex-1">
               <div className="relative flex-1 sm:max-w-xs">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <Input placeholder="Search invoices..." value={invoiceSearch} onChange={e => { setInvoiceSearch(e.target.value); setInvoicePage(1) }} className="pl-9 h-9" />
+                <Input placeholder="Search invoices..." value={searchQuery} onChange={e => { setSearchQuery(e.target.value); setInvoicePage(1) }} className="pl-9 h-9" />
               </div>
               <Select value={invoiceStatus || 'all'} onValueChange={v => { setInvoiceStatus(v === 'all' ? '' : v); setInvoicePage(1) }}>
                 <SelectTrigger className="w-[140px] h-9"><SelectValue placeholder="Status" /></SelectTrigger>
@@ -293,10 +356,10 @@ export function RentCollectionPage() {
           <DialogHeader><DialogTitle>Create Invoice</DialogTitle></DialogHeader>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FormField label="Invoice Number">
-              <Input value={invoiceData.invoiceNumber || ''} onChange={e => setInvoiceData({...invoiceData, invoiceNumber: e.target.value})} placeholder="INV-YYYY-NNNN" />
+              <Input value={invoiceData.invoiceNumber || ''} onChange={e => updateInvoiceField('invoiceNumber', e.target.value)} placeholder="INV-YYYY-NNNN" />
             </FormField>
             <FormField label="Sublease">
-              <Select value={invoiceData.subleaseId || ''} onValueChange={v => setInvoiceData({...invoiceData, subleaseId: v})}>
+              <Select value={invoiceData.subleaseId || ''} onValueChange={handleSubleaseChange}>
                 <SelectTrigger><SelectValue placeholder="Select sublease" /></SelectTrigger>
                 <SelectContent>
                   {subleases.map(s => <SelectItem key={s.id} value={s.id}>{s.subleaseNumber} - {s.subtenant?.name || s.subtenantName || ''}</SelectItem>)}
@@ -304,28 +367,28 @@ export function RentCollectionPage() {
               </Select>
             </FormField>
             <FormField label="Issue Date">
-              <Input type="date" value={invoiceData.issueDate || ''} onChange={e => setInvoiceData({...invoiceData, issueDate: e.target.value})} />
+              <Input type="date" value={invoiceData.issueDate || ''} onChange={e => updateInvoiceField('issueDate', e.target.value)} />
             </FormField>
             <FormField label="Due Date">
-              <Input type="date" value={invoiceData.dueDate || ''} onChange={e => setInvoiceData({...invoiceData, dueDate: e.target.value})} />
+              <Input type="date" value={invoiceData.dueDate || ''} onChange={e => updateInvoiceField('dueDate', e.target.value)} />
             </FormField>
             <FormField label="Period Start">
-              <Input type="date" value={invoiceData.periodStart || ''} onChange={e => setInvoiceData({...invoiceData, periodStart: e.target.value})} />
+              <Input type="date" value={invoiceData.periodStart || ''} onChange={e => updateInvoiceField('periodStart', e.target.value)} />
             </FormField>
             <FormField label="Period End">
-              <Input type="date" value={invoiceData.periodEnd || ''} onChange={e => setInvoiceData({...invoiceData, periodEnd: e.target.value})} />
+              <Input type="date" value={invoiceData.periodEnd || ''} onChange={e => updateInvoiceField('periodEnd', e.target.value)} />
             </FormField>
             <FormField label="Rent Amount">
-              <Input type="number" value={invoiceData.rentAmount || ''} onChange={e => setInvoiceData({...invoiceData, rentAmount: parseFloat(e.target.value) || 0})} />
+              <Input type="number" value={invoiceData.rentAmount || ''} onChange={e => updateInvoiceField('rentAmount', parseFloat(e.target.value) || 0)} />
             </FormField>
             <FormField label="Other Charges">
-              <Input type="number" value={invoiceData.otherCharges || 0} onChange={e => setInvoiceData({...invoiceData, otherCharges: parseFloat(e.target.value) || 0})} />
+              <Input type="number" value={invoiceData.otherCharges || 0} onChange={e => updateInvoiceField('otherCharges', parseFloat(e.target.value) || 0)} />
             </FormField>
             <FormField label="VAT Amount">
-              <Input type="number" value={invoiceData.vatAmount || 0} onChange={e => setInvoiceData({...invoiceData, vatAmount: parseFloat(e.target.value) || 0})} />
+              <Input type="number" value={invoiceData.vatAmount || 0} onChange={e => updateInvoiceField('vatAmount', parseFloat(e.target.value) || 0)} />
             </FormField>
             <FormField label="Total Amount">
-              <Input type="number" value={invoiceData.totalAmount || ''} onChange={e => setInvoiceData({...invoiceData, totalAmount: parseFloat(e.target.value) || 0})} />
+              <Input type="number" value={invoiceData.totalAmount || ''} onChange={e => updateInvoiceField('totalAmount', parseFloat(e.target.value) || 0)} />
             </FormField>
           </div>
           <DialogFooter>

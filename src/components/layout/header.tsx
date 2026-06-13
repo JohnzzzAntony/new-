@@ -22,7 +22,7 @@ const tabTitles: Record<string, string> = {
 }
 
 export function Header() {
-  const { activeTab, toggleSidebar } = useAppStore()
+  const { activeTab, toggleSidebar, searchQuery, setSearchQuery } = useAppStore()
 
   return (
     <header className="h-16 bg-white border-b flex items-center justify-between px-4 lg:px-6 shrink-0 sticky top-0 z-30">
@@ -40,13 +40,17 @@ export function Header() {
         </h2>
       </div>
       <div className="flex items-center gap-3">
-        <div className="hidden md:flex relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-          <Input
-            placeholder="Search..."
-            className="pl-9 w-64 h-9 bg-gray-50 border-gray-200"
-          />
-        </div>
+        {['companies', 'properties', 'units', 'subtenants', 'subleases', 'ejari', 'rent-collection', 'compliance'].includes(activeTab) && (
+          <div className="hidden md:flex relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Input
+              placeholder={`Search ${activeTab.replace('-', ' ')}...`}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-9 w-64 h-9 bg-gray-50 border-gray-200"
+            />
+          </div>
+        )}
         <Button variant="ghost" size="icon" className="relative h-9 w-9">
           <Bell className="w-4 h-4 text-gray-500" />
           <Badge className="absolute -top-1 -right-1 h-4 w-4 p-0 flex items-center justify-center text-[10px] bg-red-500 text-white border-0">

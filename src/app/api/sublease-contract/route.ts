@@ -15,9 +15,8 @@ export async function GET(request: NextRequest) {
     const sublease = await db.sublease.findFirst({
       where: { id, deletedAt: null },
       include: {
-        mainLease: {
+        property: {
           include: {
-            property: true,
             company: true,
           },
         },

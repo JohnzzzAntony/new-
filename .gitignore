@@ -44,3 +44,9 @@ skills/
 
 # uploads
 upload/
+
+# local dev database, scratch, and IDE files
+prisma/dev.db
+prisma/dev.db-journal
+scratch/
+.vscode/

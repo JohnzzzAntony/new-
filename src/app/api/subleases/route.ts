@@ -66,6 +66,11 @@ export async function GET(request: NextRequest) {
       where.OR = [
         { subleaseNumber: { contains: search } },
         { notes: { contains: search } },
+        { property: { name: { contains: search } } },
+        { property: { propertyCode: { contains: search } } },
+        { unit: { unitNumber: { contains: search } } },
+        { subtenant: { name: { contains: search } } },
+        { subtenant: { tradeName: { contains: search } } },
       ];
     }
 

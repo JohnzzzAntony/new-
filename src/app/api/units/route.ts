@@ -26,6 +26,8 @@ export async function GET(request: NextRequest) {
         { unitNumber: { contains: search } },
         { unitCode: { contains: search } },
         { description: { contains: search } },
+        { property: { name: { contains: search } } },
+        { property: { propertyCode: { contains: search } } },
       ];
     }
 

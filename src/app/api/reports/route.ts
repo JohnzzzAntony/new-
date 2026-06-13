@@ -155,9 +155,9 @@ export async function GET(request: NextRequest) {
         data = { reportType: 'leases', generatedAt: new Date().toISOString(), data: reportData };
         csvHeaders = ['Lease #', 'Property', 'Company', 'Landlord', 'Start Date', 'End Date', 'Rent Amount', 'Frequency', 'Status', 'Renewal Status', 'Subleases', 'Active'];
         csvRows = reportData.map((r) => [
-          r.leaseNumber, r.propertyName, r.companyName, r.landlordName,
-          r.startDate, r.endDate, String(r.rentAmount), r.rentFrequency,
-          r.status, r.renewalStatus, String(r.subleaseCount), String(r.isActive),
+          r.leaseNumber || '', r.propertyName, r.companyName, r.landlordName || '',
+          r.startDate, r.endDate, String(r.rentAmount || 0), r.rentFrequency || '',
+          r.status || '', r.renewalStatus || '', String(r.subleaseCount), String(r.isActive),
         ]);
         break;
       }

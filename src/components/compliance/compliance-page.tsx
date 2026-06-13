@@ -11,7 +11,9 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { StatusBadge, COMPLIANCE_STATUS_MAP, formatDate } from '@/components/common/module-page'
-import { Loader2, CheckCircle, AlertTriangle, XCircle, Shield } from 'lucide-react'
+import { Loader2, CheckCircle, AlertTriangle, XCircle, Shield, Search } from 'lucide-react'
+import { Input } from '@/components/ui/input'
+import { useAppStore } from '@/lib/store'
 
 const COMPLIANCE_TYPES = [
   { value: 'LEASE_EXPIRY', label: 'Lease Expiry' },
@@ -37,6 +39,7 @@ const TYPE_ICON_MAP: Record<string, React.ElementType> = {
 }
 
 export function CompliancePage() {
+  const { searchQuery, setSearchQuery } = useAppStore()
   const [alerts, setAlerts] = useState<any[]>([])
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(true)
@@ -49,7 +52,7 @@ export function CompliancePage() {
   const loadAlerts = useCallback(async () => {
     setLoading(true)
     try {
-      const params: any = {}
+      const params: any = { search: searchQuery }
       if (typeFilter) params.type = typeFilter
       if (statusFilter) params.status = statusFilter
       const result = await complianceApi.list(params)
@@ -60,7 +63,7 @@ export function CompliancePage() {
     } finally {
       setLoading(false)
     }
-  }, [typeFilter, statusFilter])
+  }, [typeFilter, statusFilter, searchQuery])
 
   useEffect(() => { loadAlerts() }, [loadAlerts])
 
@@ -123,21 +126,32 @@ export function CompliancePage() {
       </div>
 
       {/* Filters */}
-      <div className="flex gap-2">
-        <Select value={typeFilter || 'all'} onValueChange={v => setTypeFilter(v === 'all' ? '' : v)}>
-          <SelectTrigger className="w-[180px] h-9"><SelectValue placeholder="All Types" /></SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Types</SelectItem>
-            {COMPLIANCE_TYPES.map(t => <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>)}
-          </SelectContent>
-        </Select>
-        <Select value={statusFilter || 'all'} onValueChange={v => setStatusFilter(v === 'all' ? '' : v)}>
-          <SelectTrigger className="w-[160px] h-9"><SelectValue placeholder="All Statuses" /></SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Statuses</SelectItem>
-            {COMPLIANCE_STATUSES.map(s => <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>)}
-          </SelectContent>
-        </Select>
+      <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
+        <div className="flex gap-2 flex-1 w-full sm:w-auto">
+          <div className="relative flex-1 sm:max-w-xs">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Input
+              placeholder="Search compliance alerts..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-9 h-9"
+            />
+          </div>
+          <Select value={typeFilter || 'all'} onValueChange={v => setTypeFilter(v === 'all' ? '' : v)}>
+            <SelectTrigger className="w-[180px] h-9"><SelectValue placeholder="All Types" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Types</SelectItem>
+              {COMPLIANCE_TYPES.map(t => <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>)}
+            </SelectContent>
+          </Select>
+          <Select value={statusFilter || 'all'} onValueChange={v => setStatusFilter(v === 'all' ? '' : v)}>
+            <SelectTrigger className="w-[160px] h-9"><SelectValue placeholder="All Statuses" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Statuses</SelectItem>
+              {COMPLIANCE_STATUSES.map(s => <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>)}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       {/* Alerts List */}

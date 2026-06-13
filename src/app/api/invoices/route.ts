@@ -24,6 +24,9 @@ export async function GET(request: NextRequest) {
       where.OR = [
         { invoiceNumber: { contains: search } },
         { notes: { contains: search } },
+        { sublease: { subleaseNumber: { contains: search } } },
+        { sublease: { subtenant: { name: { contains: search } } } },
+        { sublease: { subtenant: { tradeName: { contains: search } } } },
       ];
     }
 
@@ -96,7 +99,7 @@ export async function POST(request: NextRequest) {
         vatAmount: body.vatAmount || 0,
         totalAmount: body.totalAmount,
         amountPaid: body.amountPaid || 0,
-        balanceDue: body.balanceDue,
+        balanceDue: body.balanceDue !== undefined && body.balanceDue !== null ? body.balanceDue : (body.totalAmount - (body.amountPaid || 0)),
         status: body.status || 'ISSUED',
         notes: body.notes,
         subleaseId: body.subleaseId,

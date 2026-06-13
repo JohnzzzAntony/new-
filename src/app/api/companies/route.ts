@@ -26,6 +26,8 @@ export async function GET(request: NextRequest) {
         { registrationNo: { contains: search } },
         { email: { contains: search } },
         { city: { contains: search } },
+        { phone: { contains: search } },
+        { contactPerson: { contains: search } },
       ];
     }
 
@@ -36,18 +38,93 @@ export async function GET(request: NextRequest) {
     const orderBy: Record<string, string> = {};
     orderBy[sortBy] = sortOrder;
 
-    const [data, total] = await Promise.all([
+    const [companies, total] = await Promise.all([
       db.company.findMany({
         where,
         skip,
         take: pageSize,
         orderBy,
+        include: {
+          properties: {
+            where: { deletedAt: null },
+            select: {
+              id: true,
+              name: true,
+              propertyCode: true,
+              leaseStatus: true,
+              subleases: {
+                where: { deletedAt: null },
+                select: {
+                  id: true,
+                  status: true,
+                  rentAmount: true,
+                  rentFrequency: true,
+                  contractValue: true,
+                  invoices: {
+                    where: { deletedAt: null, status: 'OVERDUE' },
+                    select: { balanceDue: true }
+                  }
+                }
+              }
+            },
+          },
+        },
       }),
       db.company.count({ where }),
     ]);
 
+    const mappedData = companies.map(company => {
+      let totalProperties = company.properties.length;
+      let activeLeases = company.properties.filter(p => p.leaseStatus === 'ACTIVE').length;
+      let monthlyRevenue = 0;
+      let outstandingAmount = 0;
+      
+      company.properties.forEach(p => {
+        p.subleases.forEach(sub => {
+          if (sub.status === 'ACTIVE') {
+            let freq = (sub.rentFrequency || 'monthly').toLowerCase();
+            if (freq === 'monthly') {
+              monthlyRevenue += sub.rentAmount;
+            } else if (freq === 'quarterly') {
+              monthlyRevenue += sub.rentAmount / 3;
+            } else if (freq === 'annual' || freq === 'yearly') {
+              monthlyRevenue += sub.rentAmount / 12;
+            } else {
+              monthlyRevenue += sub.contractValue / 12;
+            }
+          }
+          
+          sub.invoices.forEach(inv => {
+            outstandingAmount += inv.balanceDue;
+          });
+        });
+      });
+
+      // Compliance status determination
+      let complianceStatus = 'COMPLIANT';
+      const now = new Date();
+      if (company.tradeLicenseExpiry) {
+        const licenseExpiry = new Date(company.tradeLicenseExpiry);
+        const daysLeft = Math.ceil((licenseExpiry.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+        if (daysLeft < 0) {
+          complianceStatus = 'EXPIRED';
+        } else if (daysLeft <= 30) {
+          complianceStatus = 'WARNING';
+        }
+      }
+
+      return {
+        ...company,
+        totalProperties,
+        activeLeases,
+        monthlyRevenue: Math.round(monthlyRevenue * 100) / 100,
+        outstandingAmount: Math.round(outstandingAmount * 100) / 100,
+        complianceStatus,
+      };
+    });
+
     return NextResponse.json({
-      data,
+      data: mappedData,
       total,
       page,
       pageSize,

@@ -17,6 +17,8 @@ interface AppState {
   sidebarOpen: boolean
   detailId: string | null
   detailType: string | null
+  searchQuery: string
+  setSearchQuery: (query: string) => void
   login: (user: User, token: string) => void
   logout: () => void
   setActiveTab: (tab: string) => void
@@ -33,19 +35,21 @@ export const useAppStore = create<AppState>((set) => ({
   sidebarOpen: true,
   detailId: null,
   detailType: null,
+  searchQuery: '',
+  setSearchQuery: (query) => set({ searchQuery: query }),
   login: (user, token) => {
     localStorage.setItem('pms_token', token)
     localStorage.setItem('pms_user', JSON.stringify(user))
-    set({ user, token, activeTab: 'dashboard' })
+    set({ user, token, activeTab: 'dashboard', searchQuery: '' })
   },
   logout: () => {
     localStorage.removeItem('pms_token')
     localStorage.removeItem('pms_user')
-    set({ user: null, token: null, detailId: null, detailType: null })
+    set({ user: null, token: null, detailId: null, detailType: null, searchQuery: '' })
   },
-  setActiveTab: (tab) => set({ activeTab: tab }),
+  setActiveTab: (tab) => set({ activeTab: tab, searchQuery: '' }),
   toggleSidebar: () => set((state) => ({ sidebarOpen: !state.sidebarOpen })),
   setSidebarOpen: (open) => set({ sidebarOpen: open }),
-  setDetail: (type, id) => set({ detailType: type, detailId: id, activeTab: `${type}-detail` }),
+  setDetail: (type, id) => set({ detailType: type, detailId: id, activeTab: `${type}-detail`, searchQuery: '' }),
   clearDetail: () => set({ detailType: null, detailId: null }),
 }))

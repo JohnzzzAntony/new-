@@ -45,6 +45,9 @@ export async function GET(request: NextRequest) {
         skip,
         take: pageSize,
         orderBy,
+        include: {
+          company: { select: { id: true, name: true } },
+        },
       }),
       db.subtenant.count({ where }),
     ]);
@@ -85,8 +88,10 @@ export async function POST(request: NextRequest) {
         emiratesId: body.emiratesId,
         passportNo: body.passportNo,
         notes: body.notes,
+        companyId: body.companyId || null,
         isActive: body.isActive ?? true,
       },
+      include: { company: { select: { id: true, name: true } } },
     });
 
     return NextResponse.json({ data: subtenant }, { status: 201 });
@@ -126,10 +131,16 @@ export async function PUT(request: NextRequest) {
     if (updateData.tradeLicenseExpiry) {
       data.tradeLicenseExpiry = new Date(updateData.tradeLicenseExpiry);
     }
+    // Remove relation objects
+    delete data.company;
+    delete data.subleases;
+    delete data.ejariRegistrations;
+    delete data.documents;
 
     const subtenant = await db.subtenant.update({
       where: { id },
       data,
+      include: { company: { select: { id: true, name: true } } },
     });
 
     return NextResponse.json({ data: subtenant });

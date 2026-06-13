@@ -7,9 +7,11 @@ import { Header } from '@/components/layout/header'
 import { DashboardPage } from '@/components/dashboard/dashboard-page'
 import { CompaniesPage } from '@/components/companies/companies-page'
 import { PropertiesPage } from '@/components/properties/properties-page'
+import { PropertyDetailPage } from '@/components/properties/property-detail-page'
 import { UnitsPage } from '@/components/units/units-page'
 import { SubtenantsPage } from '@/components/subtenants/subtenants-page'
 import { SubleasesPage } from '@/components/subleases/subleases-page'
+import { SubleaseDetailPage } from '@/components/subleases/sublease-detail-page'
 import { EjariPage } from '@/components/ejari/ejari-page'
 import { RentCollectionPage } from '@/components/rent/rent-collection-page'
 import { CompliancePage } from '@/components/compliance/compliance-page'
@@ -19,9 +21,11 @@ const pageComponents: Record<string, React.ComponentType> = {
   dashboard: DashboardPage,
   companies: CompaniesPage,
   properties: PropertiesPage,
+  'property-detail': PropertyDetailPage,
   units: UnitsPage,
   subtenants: SubtenantsPage,
   subleases: SubleasesPage,
+  'sublease-detail': SubleaseDetailPage,
   ejari: EjariPage,
   'rent-collection': RentCollectionPage,
   compliance: CompliancePage,

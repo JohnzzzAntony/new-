@@ -114,3 +114,18 @@ export const notificationsApi = {
   markRead: (id: string) =>
     apiFetch<any>('/notifications', { method: 'PUT', body: JSON.stringify({ id, isRead: true }) }),
 }
+
+export const subleaseStagesApi = {
+  list: (subleaseId: string) =>
+    apiFetch<PaginatedResponse<any>>(`/sublease-stages?subleaseId=${subleaseId}`),
+  upsert: (data: any) =>
+    apiFetch<any>('/sublease-stages', { method: 'POST', body: JSON.stringify(data) }),
+  update: (id: string, data: any) =>
+    apiFetch<any>('/sublease-stages', { method: 'PUT', body: JSON.stringify({ id, ...data }) }),
+  delete: (id: string) =>
+    apiFetch<any>(`/sublease-stages?id=${encodeURIComponent(id)}`, { method: 'DELETE' }),
+}
+
+export const subleaseContractApi = {
+  get: (id: string) => apiFetch<any>(`/sublease-contract?id=${id}`),
+}

@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
@@ -64,6 +64,7 @@ model Company {
 
   properties     Property[]
   documents      Document[]
+  subtenants     Subtenant[]
 
   @@map("companies")
 }
@@ -244,11 +245,13 @@ model Subtenant {
   emiratesId        String?
   passportNo        String?
   notes             String?
+  companyId         String?  // optional link to Company record
   isActive          Boolean  @default(true)
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
   deletedAt         DateTime?
 
+  company           Company?  @relation(fields: [companyId], references: [id])
   subleases         Sublease[]
   ejariRegistrations Ejari[]
   documents         Document[]
@@ -281,6 +284,9 @@ model Sublease {
   securityDeposit  Float?
   incrementPercent Float?
   incrementFrequency Int?
+  numberOfCheques  Int?            // mode of payment: number of PDC cheques
+  pdcDates         String?         // JSON array of post-dated cheque date strings
+  paymentNotes     String?         // notes on payment arrangement
   terms            String?
   notes            String?
   status           SubleaseStatus  @default(DRAFT)
@@ -302,8 +308,30 @@ model Sublease {
   invoices         Invoice[]
   ejariRegistrations Ejari[]
   documents        Document[]
+  stages           SubleaseStage[]
 
   @@map("subleases")
+}
+
+// ============================================
+// SUBLEASE PIPELINE STAGES
+// ============================================
+
+model SubleaseStage {
+  id           String    @id @default(cuid())
+  subleaseId   String
+  stage        String    // DRAFT | SENT_FOR_SIGNING | SIGNED | SUBMITTED_TO_DREC | DREC_APPROVED | EJARI_APPLIED | EJARI_REGISTERED | ACTIVE
+  completedAt  DateTime?
+  doneBy       String?
+  documentUrl  String?
+  notes        String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  sublease     Sublease  @relation(fields: [subleaseId], references: [id])
+
+  @@unique([subleaseId, stage])
+  @@map("sublease_stages")
 }
 
 // ============================================

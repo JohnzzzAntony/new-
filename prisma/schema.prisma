@@ -63,7 +63,6 @@ model Company {
   deletedAt       DateTime?
 
   properties     Property[]
-  mainLeases     MainLease[]
   documents      Document[]
 
   @@map("companies")
@@ -104,8 +103,33 @@ model Property {
   company       Company      @relation(fields: [companyId], references: [id])
   units         Unit[]
   plots         Plot[]
-  mainLeases    MainLease[]
   documents     Document[]
+  subleases     Sublease[]
+
+  contractNo         Int?               @unique
+  leaseNumber        String?            @unique
+  leaseStartDate     DateTime?
+  leaseEndDate       DateTime?
+  rentAmount         Float?
+  rentFrequency      String?            @default("annual") // monthly, quarterly, annual
+  securityDeposit    Float?
+  incrementPercent   Float?            // annual increment %
+  incrementFrequency Int?            // every N years
+  landlordName       String?            @default("DREC Properties")
+  landlordContact    String?
+  landlordEmail      String?
+  tenantNumber       String?           // DREC tenant number
+  landNumber         String?           // DREC land number
+  annualRentPerSqFt  Float?           // Annual rent per sq ft
+  location           String?           // Location area
+  terms              String?           // JSON of terms
+  notes              String?
+  leaseStatus        LeaseStatus?       @default(DRAFT)
+  renewalStatus      LeaseRenewalStatus? @default(NONE)
+  renewedFromId      String?
+
+  renewedFrom        Property?          @relation("PropertyLeaseRenewals", fields: [renewedFromId], references: [id])
+  renewals           Property[]         @relation("PropertyLeaseRenewals")
 
   @@map("properties")
 }
@@ -197,45 +221,7 @@ enum LeaseRenewalStatus {
   REJECTED
 }
 
-model MainLease {
-  id               String            @id @default(cuid())
-  contractNo       Int               @unique
-  leaseNumber      String            @unique
-  startDate        DateTime
-  endDate          DateTime
-  rentAmount       Float
-  rentFrequency    String            @default("annual") // monthly, quarterly, annual
-  securityDeposit  Float?
-  incrementPercent Float?            // annual increment %
-  incrementFrequency Int?            // every N years
-  landlordName     String
-  landlordContact  String?
-  landlordEmail    String?
-  tenantNumber     String?           // DREC tenant number
-  landNumber       String?           // DREC land number
-  annualRentPerSqFt Float?           // Annual rent per sq ft
-  location         String?           // Location area
-  terms            String?           // JSON of terms
-  notes            String?
-  status           LeaseStatus       @default(DRAFT)
-  renewalStatus    LeaseRenewalStatus @default(NONE)
-  renewedFromId    String?
-  propertyId       String
-  companyId        String
-  isActive         Boolean           @default(true)
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime          @updatedAt
-  deletedAt        DateTime?
-
-  property         Property          @relation(fields: [propertyId], references: [id])
-  company          Company           @relation(fields: [companyId], references: [id])
-  renewedFrom      MainLease?        @relation("LeaseRenewals", fields: [renewedFromId], references: [id])
-  renewals         MainLease[]       @relation("LeaseRenewals")
-  subleases        Sublease[]
-  documents        Document[]
-
-  @@map("main_leases")
-}
+// MainLease removed and merged into Property
 
 // ============================================
 // SUBTENANT MANAGEMENT
@@ -300,7 +286,7 @@ model Sublease {
   status           SubleaseStatus  @default(DRAFT)
   renewalStatus    LeaseRenewalStatus @default(NONE)
   renewedFromId    String?
-  mainLeaseId      String
+  propertyId       String
   unitId           String
   subtenantId      String
   isActive         Boolean         @default(true)
@@ -308,7 +294,7 @@ model Sublease {
   updatedAt        DateTime        @updatedAt
   deletedAt        DateTime?
 
-  mainLease        MainLease       @relation(fields: [mainLeaseId], references: [id])
+  property         Property        @relation(fields: [propertyId], references: [id])
   unit             Unit            @relation(fields: [unitId], references: [id])
   subtenant        Subtenant       @relation(fields: [subtenantId], references: [id])
   renewedFrom      Sublease?       @relation("SubleaseRenewals", fields: [renewedFromId], references: [id])
@@ -487,7 +473,6 @@ model Document {
   companyId     String?
   propertyId    String?
   unitId        String?
-  mainLeaseId   String?
   subleaseId    String?
   ejariId       String?
   subtenantId   String?
@@ -500,7 +485,6 @@ model Document {
   company       Company?     @relation(fields: [companyId], references: [id])
   property      Property?    @relation(fields: [propertyId], references: [id])
   unit          Unit?        @relation(fields: [unitId], references: [id])
-  mainLease     MainLease?   @relation(fields: [mainLeaseId], references: [id])
   sublease      Sublease?    @relation(fields: [subleaseId], references: [id])
   ejari         Ejari?       @relation(fields: [ejariId], references: [id])
   subtenant     Subtenant?   @relation(fields: [subtenantId], references: [id])

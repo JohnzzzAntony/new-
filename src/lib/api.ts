@@ -64,7 +64,6 @@ function createCrudApi<T>(basePath: string) {
 export const companiesApi = createCrudApi<any>('/companies')
 export const propertiesApi = createCrudApi<any>('/properties')
 export const unitsApi = createCrudApi<any>('/units')
-export const mainLeasesApi = createCrudApi<any>('/main-leases')
 export const subtenantsApi = createCrudApi<any>('/subtenants')
 export const subleasesApi = createCrudApi<any>('/subleases')
 export const ejariApi = createCrudApi<any>('/ejari')

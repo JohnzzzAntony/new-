@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react'
 import { ModulePage, FormField, formatDate, formatCurrency, StatusBadge, LEASE_STATUS_MAP } from '@/components/common/module-page'
-import { subleasesApi, mainLeasesApi, unitsApi, subtenantsApi } from '@/lib/api'
+import { subleasesApi, propertiesApi, unitsApi, subtenantsApi } from '@/lib/api'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Switch } from '@/components/ui/switch'
@@ -24,12 +24,12 @@ const RENT_FREQUENCIES = [
 ]
 
 export function SubleasesPage() {
-  const [mainLeases, setMainLeases] = useState<any[]>([])
+  const [properties, setProperties] = useState<any[]>([])
   const [units, setUnits] = useState<any[]>([])
   const [subtenants, setSubtenants] = useState<any[]>([])
 
   useEffect(() => {
-    mainLeasesApi.list({ pageSize: 100 }).then(res => setMainLeases(res.data || [])).catch(() => {})
+    propertiesApi.list({ pageSize: 100, isActive: 'true' }).then(res => setProperties(res.data || [])).catch(() => {})
     unitsApi.list({ pageSize: 200 }).then(res => setUnits(res.data || [])).catch(() => {})
     subtenantsApi.list({ pageSize: 100, isActive: 'true' }).then(res => setSubtenants(res.data || [])).catch(() => {})
   }, [])
@@ -41,8 +41,7 @@ export function SubleasesPage() {
       searchPlaceholder="Search subleases..."
       columns={[
         { key: 'subleaseNumber', label: 'Contract #', render: (v: any) => <span className="font-mono font-medium">{v}</span> },
-        { key: 'mainLease', label: 'Main Lease', render: (_: any, row: any) => row.mainLease?.contractNo || row.mainLease?.leaseNumber || '-' },
-        { key: 'property', label: 'Property', render: (_: any, row: any) => row.mainLease?.property?.name || '-' },
+        { key: 'property', label: 'Property', render: (_: any, row: any) => row.property ? `${row.property.name} (${row.property.leaseNumber || 'No Lease'})` : '-' },
         { key: 'subtenant', label: 'Subtenant', render: (_: any, row: any) => row.subtenant?.name || '-' },
         { key: 'unit', label: 'Unit', render: (_: any, row: any) => row.unit?.unitNumber || '-' },
         { key: 'endDate', label: 'Expires On', render: (v: any) => formatDate(v) },
@@ -66,11 +65,11 @@ export function SubleasesPage() {
               </SelectContent>
             </Select>
           </FormField>
-          <FormField label="Main Lease">
-            <Select value={data.mainLeaseId || ''} onValueChange={v => setData({...data, mainLeaseId: v})}>
-              <SelectTrigger><SelectValue placeholder="Select main lease" /></SelectTrigger>
+          <FormField label="Property">
+            <Select value={data.propertyId || ''} onValueChange={v => setData({...data, propertyId: v})}>
+              <SelectTrigger><SelectValue placeholder="Select property" /></SelectTrigger>
               <SelectContent>
-                {mainLeases.map(l => <SelectItem key={l.id} value={l.id}>{l.contractNo} - {l.leaseNumber}</SelectItem>)}
+                {properties.map(p => <SelectItem key={p.id} value={p.id}>{p.name} {p.leaseNumber ? `(${p.leaseNumber})` : ''}</SelectItem>)}
               </SelectContent>
             </Select>
           </FormField>

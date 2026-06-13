@@ -247,7 +247,6 @@ async function main() {
   await prisma.ejari.deleteMany()
   await prisma.document.deleteMany()
   await prisma.sublease.deleteMany()
-  await prisma.mainLease.deleteMany()
   await prisma.subtenant.deleteMany()
   await prisma.unit.deleteMany()
   await prisma.plot.deleteMany()
@@ -325,6 +324,14 @@ async function main() {
     const companyId = companyMap[companyName]?.id || drecCompany.id
     const propertyName = row.plotPropertyName || `Plot ${row.plotNo}`
     
+    // Determine lease status based on dates
+    const endDate = new Date(row.leaseTo)
+    const now = new Date()
+    const startDate = new Date(row.leaseFrom)
+    let leaseStatus: LeaseStatus = LeaseStatus.ACTIVE
+    if (endDate < now) leaseStatus = LeaseStatus.EXPIRED
+    else if (startDate > now) leaseStatus = LeaseStatus.DRAFT
+
     const property = await prisma.property.create({
       data: {
         name: propertyName,
@@ -338,37 +345,12 @@ async function main() {
         totalArea: row.areaSqFt,
         builtUpArea: row.areaSqFt,
         companyId,
-        isActive: true
-      }
-    })
-    propertyMap[row.contractNo] = property
-  }
-  console.log(`✅ Properties created (${DREC_MAIN_DATA.length})`)
-
-  // ============================================
-  // MAIN LEASES (from DREC MAIN)
-  // ============================================
-  const mainLeaseMap: Record<number, any> = {}
-
-  for (const row of DREC_MAIN_DATA) {
-    const companyName = row.mainTenant || 'DREC'
-    const companyId = companyMap[companyName]?.id || drecCompany.id
-    const property = propertyMap[row.contractNo]
-
-    // Determine status based on dates
-    const endDate = new Date(row.leaseTo)
-    const now = new Date()
-    const startDate = new Date(row.leaseFrom)
-    let status: LeaseStatus = LeaseStatus.ACTIVE
-    if (endDate < now) status = LeaseStatus.EXPIRED
-    else if (startDate > now) status = LeaseStatus.DRAFT
-
-    const mainLease = await prisma.mainLease.create({
-      data: {
+        isActive: true,
+        // Merged lease fields:
         contractNo: row.contractNo,
         leaseNumber: `ML-${row.contractNo}`,
-        startDate: new Date(row.leaseFrom),
-        endDate: new Date(row.leaseTo),
+        leaseStartDate: new Date(row.leaseFrom),
+        leaseEndDate: new Date(row.leaseTo),
         rentAmount: row.annualRent,
         rentFrequency: 'annual',
         landlordName: 'DREC Properties',
@@ -378,15 +360,13 @@ async function main() {
         landNumber: row.landNumber,
         annualRentPerSqFt: row.rentPerSqFt,
         location: row.location,
-        status,
-        propertyId: property.id,
-        companyId,
-        isActive: true
+        leaseStatus,
+        renewalStatus: 'NONE'
       }
     })
-    mainLeaseMap[row.contractNo] = mainLease
+    propertyMap[row.contractNo] = property
   }
-  console.log(`✅ Main Leases created (${DREC_MAIN_DATA.length})`)
+  console.log(`✅ Properties created (${DREC_MAIN_DATA.length})`)
 
   // ============================================
   // SUBTENANTS (unique names from DREC SUB)
@@ -420,16 +400,12 @@ async function main() {
   const unitNumberCounter: Record<string, number> = {}
 
   for (const sub of DREC_SUB_DATA) {
-    // Find the main lease by contractNo
-    const mainLease = mainLeaseMap[sub.mainLeaseContractNo]
-    if (!mainLease) {
-      console.log(`⚠️  Skipping sub lease ${sub.id} - main lease ${sub.mainLeaseContractNo} not found`)
+    // Find the property by contractNo
+    const property = propertyMap[sub.mainLeaseContractNo]
+    if (!property) {
+      console.log(`⚠️  Skipping sub lease ${sub.id} - property ${sub.mainLeaseContractNo} not found`)
       continue
     }
-
-    // Find or create the property
-    const property = propertyMap[sub.mainLeaseContractNo]
-    if (!property) continue
 
     // Make unit number unique per property
     const unitKey = `${property.id}-${sub.subUnitNo}`
@@ -471,12 +447,12 @@ async function main() {
         subleaseNumber: sub.subContractNo,
         contractValue: sub.contractValue,
         subLeaseFee: sub.subLeaseFee,
-        startDate: mainLease.startDate,
+        startDate: property.leaseStartDate || new Date(),
         endDate: subEndDate,
         rentAmount: sub.contractValue,
         rentFrequency: 'annual',
         status: subStatus,
-        mainLeaseId: mainLease.id,
+        propertyId: property.id,
         unitId: unit.id,
         subtenantId: subtenant.id,
         isActive: true
@@ -489,7 +465,7 @@ async function main() {
       await prisma.ejari.create({
         data: {
           ejariNumber: sub.ejariNo,
-          registrationDate: mainLease.startDate,
+          registrationDate: property.leaseStartDate || new Date(),
           expiryDate: subEndDate,
           status: EjariStatus.REGISTERED,
           subleaseId: sublease.id,
@@ -530,15 +506,15 @@ async function main() {
     const daysUntil = Math.ceil((endDate.getTime() - now2.getTime()) / (1000 * 60 * 60 * 24))
     
     if (daysUntil < 90 && daysUntil > -30) {
-      const mainLease = mainLeaseMap[row.contractNo]
-      if (mainLease) {
+      const property = propertyMap[row.contractNo]
+      if (property) {
         await prisma.complianceAlert.create({
           data: {
             type: ComplianceType.LEASE_EXPIRY,
-            title: `Main Lease ML-${row.contractNo} Expiring`,
-            description: `Main lease for ${row.plotPropertyName || row.plotNo} ${daysUntil < 0 ? 'has expired' : `expires in ${daysUntil} days`}.`,
-            entityType: 'MainLease',
-            entityId: mainLease.id,
+            title: `Property Lease PROP-${row.contractNo} Expiring`,
+            description: `Property lease for ${row.plotPropertyName || row.plotNo} ${daysUntil < 0 ? 'has expired' : `expires in ${daysUntil} days`}.`,
+            entityType: 'Property',
+            entityId: property.id,
             expiryDate: endDate,
             daysUntilExpiry: daysUntil,
             status: daysUntil < 0 ? ComplianceStatus.EXPIRED : daysUntil < 30 ? ComplianceStatus.ACTION_REQUIRED : ComplianceStatus.WARNING,
@@ -566,7 +542,7 @@ async function main() {
   console.log('🎉 Seeding completed successfully!')
   console.log('')
   console.log('📋 Summary:')
-  console.log(`  Main Leases: ${DREC_MAIN_DATA.length}`)
+  console.log(`  Properties: ${DREC_MAIN_DATA.length}`)
   console.log(`  Sub Leases: ${DREC_SUB_DATA.length}`)
   console.log(`  Unique Subtenants: ${subtenantNames.length}`)
   console.log(`  Companies: ${companyNames.length + 1}`)

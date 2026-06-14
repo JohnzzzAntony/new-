@@ -58,7 +58,7 @@ export function SubleasesPage() {
         { key: 'property', label: 'Property', render: (_: any, row: any) => row.property ? `${row.property.name} (${row.property.leaseNumber || 'No Lease'})` : '-' },
         { key: 'subtenant', label: 'Subtenant', render: (_: any, row: any) => row.subtenant?.name || '-' },
         { key: 'unit', label: 'Unit', render: (_: any, row: any) => row.unit?.unitNumber || '-' },
-        { key: 'endDate', label: 'Expires On', render: (v: any) => formatDate(v) },
+        { key: 'endDate', label: 'Expires On', render: (v: any) => v ? formatDate(v) : '-' },
         { key: 'contractValue', label: 'Contract Value', render: (v: any) => formatCurrency(v) },
         { key: 'subLeaseFee', label: 'Sub-Lease Fee', render: (v: any) => formatCurrency(v) },
         { key: 'status', label: 'Status', render: (v: any) => <StatusBadge status={v} map={LEASE_STATUS_MAP} /> },
@@ -80,25 +80,28 @@ export function SubleasesPage() {
             </Select>
           </FormField>
           <FormField label="Property">
-            <Select value={data.propertyId || ''} onValueChange={v => setData({...data, propertyId: v})}>
+            <Select value={data.propertyId || 'none'} onValueChange={v => setData({...data, propertyId: v === 'none' ? null : v})}>
               <SelectTrigger><SelectValue placeholder="Select property" /></SelectTrigger>
               <SelectContent>
+                <SelectItem value="none">— Select none —</SelectItem>
                 {properties.map(p => <SelectItem key={p.id} value={p.id}>{p.name} {p.leaseNumber ? `(${p.leaseNumber})` : ''}</SelectItem>)}
               </SelectContent>
             </Select>
           </FormField>
           <FormField label="Unit">
-            <Select value={data.unitId || ''} onValueChange={v => setData({...data, unitId: v})}>
+            <Select value={data.unitId || 'none'} onValueChange={v => setData({...data, unitId: v === 'none' ? null : v})}>
               <SelectTrigger><SelectValue placeholder="Select unit" /></SelectTrigger>
               <SelectContent>
+                <SelectItem value="none">— Select none —</SelectItem>
                 {units.map(u => <SelectItem key={u.id} value={u.id}>{u.unitNumber} - {u.unitType}</SelectItem>)}
               </SelectContent>
             </Select>
           </FormField>
           <FormField label="Subtenant">
-            <Select value={data.subtenantId || ''} onValueChange={v => setData({...data, subtenantId: v})}>
+            <Select value={data.subtenantId || 'none'} onValueChange={v => setData({...data, subtenantId: v === 'none' ? null : v})}>
               <SelectTrigger><SelectValue placeholder="Select subtenant" /></SelectTrigger>
               <SelectContent>
+                <SelectItem value="none">— Select none —</SelectItem>
                 {subtenants.map(s => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}
               </SelectContent>
             </Select>

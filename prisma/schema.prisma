@@ -86,24 +86,24 @@ enum PropertyType {
 
 model Property {
   id            String       @id @default(cuid())
-  name          String
+  name          String?
   propertyCode  String       @unique
   propertyType  PropertyType @default(INDUSTRIAL)
   description   String?
-  address       String
+  address       String?
   city          String       @default("Dubai")
   area          String?
   plotNumber    String?
   totalArea     Float?       // sq ft
   builtUpArea   Float?
   yearBuilt     Int?
-  companyId     String
+  companyId     String?
   isActive      Boolean      @default(true)
   createdAt     DateTime     @default(now())
   updatedAt     DateTime     @updatedAt
   deletedAt     DateTime?
 
-  company       Company      @relation(fields: [companyId], references: [id])
+  company       Company?     @relation(fields: [companyId], references: [id])
   units         Unit[]
   plots         Plot[]
   documents     Document[]
@@ -145,12 +145,12 @@ model Plot {
   zoning        String?
   status        String   @default("available") // available, leased, reserved
   notes         String?
-  propertyId    String
+  propertyId    String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
   deletedAt     DateTime?
 
-  property      Property @relation(fields: [propertyId], references: [id])
+  property      Property? @relation(fields: [propertyId], references: [id])
 
   @@unique([plotNumber, propertyId])
   @@map("plots")
@@ -191,13 +191,13 @@ model Unit {
   amenities     String?    // JSON string of amenities
   description   String?
   notes         String?
-  propertyId    String
+  propertyId    String?
   isActive      Boolean    @default(true)
   createdAt     DateTime   @default(now())
   updatedAt     DateTime   @updatedAt
   deletedAt     DateTime?
 
-  property      Property   @relation(fields: [propertyId], references: [id])
+  property      Property?   @relation(fields: [propertyId], references: [id])
   subleases     Sublease[]
   documents     Document[]
 
@@ -238,9 +238,9 @@ model Subtenant {
   tradeLicenseNo    String?
   tradeLicenseExpiry DateTime?
   registrationNo    String?
-  contactPerson     String
-  phone             String
-  email             String
+  contactPerson     String?
+  phone             String?
+  email             String?
   address           String?
   city              String?
   country           String   @default("UAE")
@@ -280,9 +280,9 @@ model Sublease {
   subleaseNumber   String          @unique
   contractValue    Float           @default(0)
   subLeaseFee      Float           @default(0)
-  startDate        DateTime
-  endDate          DateTime
-  rentAmount       Float
+  startDate        DateTime?
+  endDate          DateTime?
+  rentAmount       Float?
   rentFrequency    String          @default("monthly")
   securityDeposit  Float?
   incrementPercent Float?
@@ -295,17 +295,17 @@ model Sublease {
   status           SubleaseStatus  @default(DRAFT)
   renewalStatus    LeaseRenewalStatus @default(NONE)
   renewedFromId    String?
-  propertyId       String
-  unitId           String
-  subtenantId      String
+  propertyId       String?
+  unitId           String?
+  subtenantId      String?
   isActive         Boolean         @default(true)
   createdAt        DateTime        @default(now())
   updatedAt        DateTime        @updatedAt
   deletedAt        DateTime?
 
-  property         Property        @relation(fields: [propertyId], references: [id])
-  unit             Unit            @relation(fields: [unitId], references: [id])
-  subtenant        Subtenant       @relation(fields: [subtenantId], references: [id])
+  property         Property?        @relation(fields: [propertyId], references: [id])
+  unit             Unit?            @relation(fields: [unitId], references: [id])
+  subtenant        Subtenant?       @relation(fields: [subtenantId], references: [id])
   renewedFrom      Sublease?       @relation("SubleaseRenewals", fields: [renewedFromId], references: [id])
   renewals         Sublease[]      @relation("SubleaseRenewals")
   invoices         Invoice[]
@@ -322,8 +322,8 @@ model Sublease {
 
 model SubleaseStage {
   id           String    @id @default(cuid())
-  subleaseId   String
-  stage        String    // DRAFT | SENT_FOR_SIGNING | SIGNED | SUBMITTED_TO_DREC | DREC_APPROVED | EJARI_APPLIED | EJARI_REGISTERED | ACTIVE
+  subleaseId   String?
+  stage        String?    // DRAFT | SENT_FOR_SIGNING | SIGNED | SUBMITTED_TO_DREC | DREC_APPROVED | EJARI_APPLIED | EJARI_REGISTERED | ACTIVE
   completedAt  DateTime?
   doneBy       String?
   documentUrl  String?
@@ -331,7 +331,7 @@ model SubleaseStage {
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
 
-  sublease     Sublease  @relation(fields: [subleaseId], references: [id])
+  sublease     Sublease?  @relation(fields: [subleaseId], references: [id])
 
   @@unique([subleaseId, stage])
   @@map("sublease_stages")
@@ -357,15 +357,15 @@ model Ejari {
   certificateUrl    String?
   status            EjariStatus @default(PENDING)
   notes             String?
-  subleaseId        String
-  subtenantId       String
+  subleaseId        String?
+  subtenantId       String?
   isActive          Boolean     @default(true)
   createdAt         DateTime    @default(now())
   updatedAt         DateTime    @updatedAt
   deletedAt         DateTime?
 
-  sublease          Sublease    @relation(fields: [subleaseId], references: [id])
-  subtenant         Subtenant   @relation(fields: [subtenantId], references: [id])
+  sublease          Sublease?    @relation(fields: [subleaseId], references: [id])
+  subtenant         Subtenant?   @relation(fields: [subtenantId], references: [id])
   documents         Document[]
 
   @@map("ejari_registrations")
@@ -395,25 +395,25 @@ enum PaymentMethod {
 model Invoice {
   id              String        @id @default(cuid())
   invoiceNumber   String        @unique
-  issueDate       DateTime
-  dueDate         DateTime
-  periodStart     DateTime
-  periodEnd       DateTime
-  rentAmount      Float
+  issueDate       DateTime?
+  dueDate         DateTime?
+  periodStart     DateTime?
+  periodEnd       DateTime?
+  rentAmount      Float?
   otherCharges    Float         @default(0)
   vatAmount       Float         @default(0)
-  totalAmount     Float
+  totalAmount     Float?
   amountPaid      Float         @default(0)
-  balanceDue      Float
+  balanceDue      Float?
   status          InvoiceStatus @default(ISSUED)
   notes           String?
-  subleaseId      String
+  subleaseId      String?
   isActive        Boolean       @default(true)
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
   deletedAt       DateTime?
 
-  sublease        Sublease      @relation(fields: [subleaseId], references: [id])
+  sublease        Sublease?      @relation(fields: [subleaseId], references: [id])
   receipts        Receipt[]
 
   @@map("invoices")
@@ -422,9 +422,9 @@ model Invoice {
 model Receipt {
   id              String        @id @default(cuid())
   receiptNumber   String        @unique
-  invoiceId       String
-  amount          Float
-  paymentDate     DateTime
+  invoiceId       String?
+  amount          Float?
+  paymentDate     DateTime?
   paymentMethod   PaymentMethod @default(BANK_TRANSFER)
   referenceNo     String?
   bankName        String?
@@ -434,7 +434,7 @@ model Receipt {
   updatedAt       DateTime      @updatedAt
   deletedAt       DateTime?
 
-  invoice         Invoice       @relation(fields: [invoiceId], references: [id])
+  invoice         Invoice?       @relation(fields: [invoiceId], references: [id])
 
   @@map("receipts")
 }
@@ -460,12 +460,12 @@ enum ComplianceStatus {
 
 model ComplianceAlert {
   id              String           @id @default(cuid())
-  type            ComplianceType
-  title           String
+  type            ComplianceType?
+  title           String?
   description     String?
-  entityType      String           // "MainLease", "Sublease", "Ejari", "Company"
-  entityId        String
-  expiryDate      DateTime
+  entityType      String?           // "MainLease", "Sublease", "Ejari", "Company"
+  entityId        String?
+  expiryDate      DateTime?
   daysUntilExpiry Int?
   status          ComplianceStatus @default(COMPLIANT)
   isNotified      Boolean          @default(false)
@@ -494,13 +494,13 @@ enum DocumentType {
 
 model Document {
   id            String       @id @default(cuid())
-  name          String
+  name          String?
   documentType  DocumentType @default(OTHER)
-  fileUrl       String
+  fileUrl       String?
   fileSize      Int?
   mimeType      String?
-  entityType    String       // "Company", "Property", "Unit", "MainLease", "Sublease", "Ejari", "Subtenant"
-  entityId      String
+  entityType    String?       // "Company", "Property", "Unit", "MainLease", "Sublease", "Ejari", "Subtenant"
+  entityId      String?
   companyId     String?
   propertyId    String?
   unitId        String?
@@ -530,9 +530,9 @@ model Document {
 model AuditLog {
   id         String   @id @default(cuid())
   userId     String?
-  action     String   // CREATE, UPDATE, DELETE, ARCHIVE, RESTORE
-  entityType String
-  entityId   String
+  action     String?   // CREATE, UPDATE, DELETE, ARCHIVE, RESTORE
+  entityType String?
+  entityId   String?
   changes    String?  // JSON string of changes
   ipAddress  String?
   userAgent  String?
@@ -560,9 +560,9 @@ enum NotificationType {
 
 model Notification {
   id          String           @id @default(cuid())
-  type        NotificationType
-  title       String
-  message     String
+  type        NotificationType?
+  title       String?
+  message     String?
   isRead      Boolean          @default(false)
   userId      String?
   entityType  String?
@@ -579,20 +579,20 @@ model Notification {
 
 model Asset {
   id            String    @id @default(cuid())
-  name          String
+  name          String?
   assetCode     String    @unique
-  category      String    // e.g. Machinery, Furniture, HVAC
-  value         Float
-  purchaseDate  DateTime
+  category      String?    // e.g. Machinery, Furniture, HVAC
+  value         Float?
+  purchaseDate  DateTime?
   status        String    @default("ACTIVE") // ACTIVE, UNDER_MAINTENANCE, RETIRED
   notes         String?
-  companyId     String
+  companyId     String?
   propertyId    String?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   deletedAt     DateTime?
 
-  company       Company   @relation(fields: [companyId], references: [id])
+  company       Company?   @relation(fields: [companyId], references: [id])
   property      Property? @relation(fields: [propertyId], references: [id])
 
   @@map("assets")

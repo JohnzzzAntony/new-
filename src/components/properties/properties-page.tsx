@@ -155,9 +155,10 @@ export function PropertiesPage() {
             </Select>
           </FormField>
           <FormField label="Company">
-            <Select value={data.companyId || ''} onValueChange={v => setData({...data, companyId: v})}>
+            <Select value={data.companyId || 'none'} onValueChange={v => setData({...data, companyId: v === 'none' ? null : v})}>
               <SelectTrigger><SelectValue placeholder="Select company" /></SelectTrigger>
               <SelectContent>
+                <SelectItem value="none">— Select none —</SelectItem>
                 {companies.map(c => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
               </SelectContent>
             </Select>

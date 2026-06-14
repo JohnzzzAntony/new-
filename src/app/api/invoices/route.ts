@@ -64,8 +64,8 @@ export async function GET(request: NextRequest) {
 
     const formattedData = data.map((invoice) => ({
       ...invoice,
-      subtenantName: invoice.sublease.subtenant.name,
-      subtenantTradeName: invoice.sublease.subtenant.tradeName,
+      subtenantName: invoice.sublease?.subtenant?.name || null,
+      subtenantTradeName: invoice.sublease?.subtenant?.tradeName || null,
     }));
 
     return NextResponse.json({
@@ -87,22 +87,26 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
 
+    if (!body.invoiceNumber) {
+      return NextResponse.json({ error: 'Invoice number is required' }, { status: 400 });
+    }
+
     const invoice = await db.invoice.create({
       data: {
         invoiceNumber: body.invoiceNumber,
-        issueDate: new Date(body.issueDate),
-        dueDate: new Date(body.dueDate),
-        periodStart: new Date(body.periodStart),
-        periodEnd: new Date(body.periodEnd),
-        rentAmount: body.rentAmount,
+        issueDate: body.issueDate ? new Date(body.issueDate) : null,
+        dueDate: body.dueDate ? new Date(body.dueDate) : null,
+        periodStart: body.periodStart ? new Date(body.periodStart) : null,
+        periodEnd: body.periodEnd ? new Date(body.periodEnd) : null,
+        rentAmount: body.rentAmount ? parseFloat(body.rentAmount) : null,
         otherCharges: body.otherCharges || 0,
         vatAmount: body.vatAmount || 0,
-        totalAmount: body.totalAmount,
+        totalAmount: body.totalAmount ? parseFloat(body.totalAmount) : null,
         amountPaid: body.amountPaid || 0,
-        balanceDue: body.balanceDue !== undefined && body.balanceDue !== null ? body.balanceDue : (body.totalAmount - (body.amountPaid || 0)),
+        balanceDue: body.balanceDue !== undefined && body.balanceDue !== null ? parseFloat(body.balanceDue) : (body.totalAmount ? (parseFloat(body.totalAmount) - (body.amountPaid || 0)) : null),
         status: body.status || 'ISSUED',
         notes: body.notes,
-        subleaseId: body.subleaseId,
+        subleaseId: body.subleaseId || null,
         isActive: body.isActive ?? true,
       },
       include: {
@@ -159,10 +163,16 @@ export async function PUT(request: NextRequest) {
     }
 
     const data: Record<string, unknown> = { ...updateData };
-    if (updateData.issueDate) data.issueDate = new Date(updateData.issueDate);
-    if (updateData.dueDate) data.dueDate = new Date(updateData.dueDate);
-    if (updateData.periodStart) data.periodStart = new Date(updateData.periodStart);
-    if (updateData.periodEnd) data.periodEnd = new Date(updateData.periodEnd);
+    if (updateData.issueDate !== undefined) data.issueDate = updateData.issueDate ? new Date(updateData.issueDate) : null;
+    if (updateData.dueDate !== undefined) data.dueDate = updateData.dueDate ? new Date(updateData.dueDate) : null;
+    if (updateData.periodStart !== undefined) data.periodStart = updateData.periodStart ? new Date(updateData.periodStart) : null;
+    if (updateData.periodEnd !== undefined) data.periodEnd = updateData.periodEnd ? new Date(updateData.periodEnd) : null;
+    if (updateData.subleaseId !== undefined) data.subleaseId = updateData.subleaseId || null;
+    if (updateData.rentAmount !== undefined) data.rentAmount = updateData.rentAmount !== null && updateData.rentAmount !== '' ? parseFloat(updateData.rentAmount as string) : null;
+    if (updateData.totalAmount !== undefined) data.totalAmount = updateData.totalAmount !== null && updateData.totalAmount !== '' ? parseFloat(updateData.totalAmount as string) : null;
+    if (updateData.balanceDue !== undefined) data.balanceDue = updateData.balanceDue !== null && updateData.balanceDue !== '' ? parseFloat(updateData.balanceDue as string) : null;
+    delete data.sublease;
+    delete data.receipts;
 
     const invoice = await db.invoice.update({
       where: { id },

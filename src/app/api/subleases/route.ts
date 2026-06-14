@@ -126,18 +126,22 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
 
+    if (!body.subleaseNumber) {
+      return NextResponse.json({ error: 'Sublease number is required' }, { status: 400 });
+    }
+
     const sublease = await db.sublease.create({
       data: {
         subleaseNumber: body.subleaseNumber,
         contractValue: body.contractValue ?? 0,
         subLeaseFee: body.subLeaseFee ?? 0,
-        startDate: new Date(body.startDate),
-        endDate: new Date(body.endDate),
-        rentAmount: body.rentAmount,
+        startDate: body.startDate ? new Date(body.startDate) : null,
+        endDate: body.endDate ? new Date(body.endDate) : null,
+        rentAmount: body.rentAmount ? parseFloat(body.rentAmount) : null,
         rentFrequency: body.rentFrequency || 'monthly',
-        securityDeposit: body.securityDeposit,
-        incrementPercent: body.incrementPercent,
-        incrementFrequency: body.incrementFrequency,
+        securityDeposit: body.securityDeposit ? parseFloat(body.securityDeposit) : null,
+        incrementPercent: body.incrementPercent ? parseFloat(body.incrementPercent) : null,
+        incrementFrequency: body.incrementFrequency ? parseInt(body.incrementFrequency) : null,
         numberOfCheques: body.numberOfCheques ?? null,
         pdcDates: body.pdcDates ?? null,
         paymentNotes: body.paymentNotes ?? null,
@@ -145,10 +149,10 @@ export async function POST(request: NextRequest) {
         notes: body.notes,
         status: body.status || 'DRAFT',
         renewalStatus: body.renewalStatus || 'NONE',
-        renewedFromId: body.renewedFromId,
-        propertyId: body.propertyId,
-        unitId: body.unitId,
-        subtenantId: body.subtenantId,
+        renewedFromId: body.renewedFromId || null,
+        propertyId: body.propertyId || null,
+        unitId: body.unitId || null,
+        subtenantId: body.subtenantId || null,
         isActive: body.isActive ?? true,
       },
       include: SUBLEASE_INCLUDE,
@@ -176,8 +180,16 @@ export async function PUT(request: NextRequest) {
     if (!existing) return NextResponse.json({ error: 'Sublease not found' }, { status: 404 });
 
     const data: Record<string, unknown> = { ...updateData };
-    if (updateData.startDate) data.startDate = new Date(updateData.startDate);
-    if (updateData.endDate) data.endDate = new Date(updateData.endDate);
+    if (updateData.startDate !== undefined) data.startDate = updateData.startDate ? new Date(updateData.startDate) : null;
+    if (updateData.endDate !== undefined) data.endDate = updateData.endDate ? new Date(updateData.endDate) : null;
+    if (updateData.propertyId !== undefined) data.propertyId = updateData.propertyId || null;
+    if (updateData.unitId !== undefined) data.unitId = updateData.unitId || null;
+    if (updateData.subtenantId !== undefined) data.subtenantId = updateData.subtenantId || null;
+    if (updateData.renewedFromId !== undefined) data.renewedFromId = updateData.renewedFromId || null;
+    if (updateData.rentAmount !== undefined) data.rentAmount = updateData.rentAmount !== null && updateData.rentAmount !== '' ? parseFloat(updateData.rentAmount as string) : null;
+    if (updateData.contractValue !== undefined) data.contractValue = updateData.contractValue !== null && updateData.contractValue !== '' ? parseFloat(updateData.contractValue as string) : 0;
+    if (updateData.subLeaseFee !== undefined) data.subLeaseFee = updateData.subLeaseFee !== null && updateData.subLeaseFee !== '' ? parseFloat(updateData.subLeaseFee as string) : 0;
+    
     // Remove relation objects that Prisma cannot write directly
     delete data.property;
     delete data.unit;

@@ -139,19 +139,13 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
 
     // Validate required fields
-    if (!body.name) {
-      return NextResponse.json({ error: 'Property name is required' }, { status: 400 });
-    }
     if (!body.propertyCode) {
       return NextResponse.json({ error: 'Property code is required' }, { status: 400 });
-    }
-    if (!body.companyId) {
-      return NextResponse.json({ error: 'Company is required' }, { status: 400 });
     }
 
     const property = await db.property.create({
       data: {
-        name: body.name,
+        name: body.name || null,
         propertyCode: body.propertyCode,
         propertyType: body.propertyType || 'INDUSTRIAL',
         description: body.description || null,
@@ -162,7 +156,7 @@ export async function POST(request: NextRequest) {
         totalArea: body.totalArea ? parseFloat(body.totalArea) : null,
         builtUpArea: body.builtUpArea ? parseFloat(body.builtUpArea) : null,
         yearBuilt: body.yearBuilt ? parseInt(body.yearBuilt) : null,
-        companyId: body.companyId,
+        companyId: body.companyId || null,
         isActive: body.isActive ?? true,
         // Merged lease fields:
         contractNo: body.contractNo ? parseInt(body.contractNo) : null,
@@ -200,8 +194,8 @@ export async function POST(request: NextRequest) {
     const errMsg = error instanceof Error ? error.message : 'Internal server error';
     if (errMsg.includes('Unique')) {
       return NextResponse.json(
-        { error: 'Property code already exists' },
-        { status: 409 }
+          { error: 'Property code already exists' },
+          { status: 409 }
       );
     }
     return NextResponse.json(
@@ -248,7 +242,7 @@ export async function PUT(request: NextRequest) {
     if (body.totalArea !== undefined) updateData.totalArea = body.totalArea !== null && body.totalArea !== '' ? parseFloat(body.totalArea) : null;
     if (body.builtUpArea !== undefined) updateData.builtUpArea = body.builtUpArea !== null && body.builtUpArea !== '' ? parseFloat(body.builtUpArea) : null;
     if (body.yearBuilt !== undefined) updateData.yearBuilt = body.yearBuilt !== null && body.yearBuilt !== '' ? parseInt(body.yearBuilt) : null;
-    if (body.companyId !== undefined) updateData.companyId = body.companyId;
+    if (body.companyId !== undefined) updateData.companyId = body.companyId || null;
     if (body.isActive !== undefined) updateData.isActive = body.isActive;
     // Merged lease fields:
     if (body.contractNo !== undefined) updateData.contractNo = body.contractNo !== null && body.contractNo !== '' ? parseInt(body.contractNo) : null;

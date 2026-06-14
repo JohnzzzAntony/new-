@@ -34,7 +34,7 @@ export function EjariPage() {
         { key: 'ejariNumber', label: 'EJARI #', render: (v: any) => <span className="font-mono font-medium">{v || 'Pending'}</span> },
         { key: 'sublease', label: 'Sublease', render: (_: any, row: any) => row.sublease?.subleaseNumber || '-' },
         { key: 'subtenant', label: 'Subtenant', render: (_: any, row: any) => row.subtenant?.name || '-' },
-        { key: 'registrationDate', label: 'Registration', render: (v: any) => formatDate(v) },
+        { key: 'registrationDate', label: 'Registration', render: (v: any) => v ? formatDate(v) : '-' },
         { key: 'expiryDate', label: 'Expiry', render: (v: any) => {
           if (!v) return '-'
           const isExpired = new Date(v) < new Date()
@@ -60,17 +60,19 @@ export function EjariPage() {
             </Select>
           </FormField>
           <FormField label="Sublease">
-            <Select value={data.subleaseId || ''} onValueChange={v => setData({...data, subleaseId: v})}>
+            <Select value={data.subleaseId || 'none'} onValueChange={v => setData({...data, subleaseId: v === 'none' ? null : v})}>
               <SelectTrigger><SelectValue placeholder="Select sublease" /></SelectTrigger>
               <SelectContent>
+                <SelectItem value="none">— Select none —</SelectItem>
                 {subleases.map(s => <SelectItem key={s.id} value={s.id}>{s.subleaseNumber}</SelectItem>)}
               </SelectContent>
             </Select>
           </FormField>
           <FormField label="Subtenant">
-            <Select value={data.subtenantId || ''} onValueChange={v => setData({...data, subtenantId: v})}>
+            <Select value={data.subtenantId || 'none'} onValueChange={v => setData({...data, subtenantId: v === 'none' ? null : v})}>
               <SelectTrigger><SelectValue placeholder="Select subtenant" /></SelectTrigger>
               <SelectContent>
+                <SelectItem value="none">— Select none —</SelectItem>
                 {subtenants.map(s => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}
               </SelectContent>
             </Select>

@@ -13,7 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Textarea } from '@/components/ui/textarea'
 import {
   ArrowLeft, Building2, FileText, Box, Plus, Pencil, Check, X,
-  MapPin, Calendar, DollarSign, Loader2, RefreshCw
+  MapPin, Calendar, DollarSign, Loader2, RefreshCw, HelpCircle
 } from 'lucide-react'
 import { formatDate, formatCurrency, FormField } from '@/components/common/module-page'
 
@@ -205,7 +205,9 @@ export function PropertyDetailPage() {
         leaseStartDate: leaseForm.startDate ? new Date(leaseForm.startDate).toISOString() : null,
         leaseEndDate: leaseForm.endDate ? new Date(leaseForm.endDate).toISOString() : null,
         rentAmount: parseFloat(leaseForm.rentAmount) || 0,
-        annualRentPerSqFt: leaseForm.annualRentPerSqFt ? parseFloat(leaseForm.annualRentPerSqFt) : null,
+        annualRentPerSqFt: property?.totalArea && leaseForm.rentAmount
+          ? parseFloat((parseFloat(leaseForm.rentAmount) / property.totalArea).toFixed(2))
+          : (leaseForm.annualRentPerSqFt ? parseFloat(leaseForm.annualRentPerSqFt) : null),
         rentFrequency: leaseForm.rentFrequency || 'annual',
         securityDeposit: parseFloat(leaseForm.securityDeposit) || 0,
         incrementPercent: leaseForm.incrementPercent ? parseFloat(leaseForm.incrementPercent) : null,
@@ -428,8 +430,30 @@ export function PropertyDetailPage() {
                   <FormField label="Rent Amount (AED)">
                     <Input type="number" value={leaseForm.rentAmount || ''} onChange={e => setLeaseForm({...leaseForm, rentAmount: parseFloat(e.target.value) || 0})} />
                   </FormField>
-                  <FormField label="Annual Rent/Sq.Ft (AED)">
-                    <Input type="number" value={leaseForm.annualRentPerSqFt || ''} onChange={e => setLeaseForm({...leaseForm, annualRentPerSqFt: parseFloat(e.target.value) || undefined})} />
+                  <FormField label={
+                    <div className="flex items-center gap-1">
+                      <span>Annual Rent/Sq.Ft (AED)</span>
+                      <div className="text-gray-400 hover:text-gray-600 cursor-help" title="Automatically calculated: Rent Amount / Total Area">
+                        <HelpCircle className="w-3.5 h-3.5" />
+                      </div>
+                    </div>
+                  }>
+                    <div className="relative flex flex-col gap-1 w-full">
+                      <Input
+                        type="text"
+                        disabled
+                        readOnly
+                        value={
+                          property?.totalArea && leaseForm.rentAmount
+                            ? (leaseForm.rentAmount / property.totalArea).toFixed(2)
+                            : leaseForm.annualRentPerSqFt || '0.00'
+                        }
+                        className="bg-gray-50 text-gray-500 cursor-not-allowed border-gray-200"
+                      />
+                      <span className="text-xs text-gray-400">
+                        This value is automatically calculated (Rent Amount / Total Area) and is read-only.
+                      </span>
+                    </div>
                   </FormField>
                   <FormField label="Rent Frequency">
                     <Select value={leaseForm.rentFrequency || 'annual'} onValueChange={v => setLeaseForm({...leaseForm, rentFrequency: v})}>

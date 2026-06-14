@@ -138,9 +138,22 @@ export async function GET(request: NextRequest) {
   }
 }
 
+function parseSafeDate(val: any): Date | null {
+  if (!val) return null;
+  const d = new Date(val);
+  return isNaN(d.getTime()) ? null : d;
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
+
+    if (!body.name || typeof body.name !== 'string' || body.name.trim() === '') {
+      return NextResponse.json(
+        { error: 'Company Name is required' },
+        { status: 400 }
+      );
+    }
 
     const company = await db.company.create({
       data: {
@@ -148,7 +161,7 @@ export async function POST(request: NextRequest) {
         tradeName: body.tradeName,
         registrationNo: body.registrationNo,
         tradeLicenseNo: body.tradeLicenseNo,
-        tradeLicenseExpiry: body.tradeLicenseExpiry ? new Date(body.tradeLicenseExpiry) : null,
+        tradeLicenseExpiry: parseSafeDate(body.tradeLicenseExpiry),
         emiratesId: body.emiratesId,
         address: body.address,
         city: body.city,
@@ -210,7 +223,7 @@ export async function PUT(request: NextRequest) {
     if (body.registrationNo !== undefined) data.registrationNo = body.registrationNo;
     if (body.tradeLicenseNo !== undefined) data.tradeLicenseNo = body.tradeLicenseNo;
     if (body.tradeLicenseExpiry !== undefined) {
-      data.tradeLicenseExpiry = body.tradeLicenseExpiry ? new Date(body.tradeLicenseExpiry) : null;
+      data.tradeLicenseExpiry = parseSafeDate(body.tradeLicenseExpiry);
     }
     if (body.emiratesId !== undefined) data.emiratesId = body.emiratesId;
     if (body.address !== undefined) data.address = body.address;

@@ -72,13 +72,13 @@ export function PropertiesPage() {
       columns={[
         {
           key: 'propertyCode',
-          label: 'Code',
+          label: 'Plot No.',
           render: (v: any, row: any) => (
             <button
               onClick={() => setDetail('property', row.id)}
               className="font-mono text-xs text-emerald-600 hover:text-emerald-800 hover:underline text-left bg-transparent border-0 p-0 cursor-pointer"
             >
-              {v}
+              {row.plotNumber || v || '—'}
             </button>
           )
         },
@@ -136,8 +136,15 @@ export function PropertiesPage() {
           <FormField label="Property Name">
             <Input value={data.name || ''} onChange={e => setData({...data, name: e.target.value})} placeholder="Enter property name" />
           </FormField>
-          <FormField label="Property Code">
-            <Input value={data.propertyCode || ''} onChange={e => setData({...data, propertyCode: e.target.value})} placeholder="PROP-XXX-NNN" />
+          <FormField label="Plot No.">
+            <Input
+              value={data.plotNumber || ''}
+              onChange={e => {
+                const val = e.target.value;
+                setData({ ...data, plotNumber: val, propertyCode: val });
+              }}
+              placeholder="e.g. 0613-1208"
+            />
           </FormField>
           <FormField label="Property Type">
             <Select value={data.propertyType || 'WAREHOUSE'} onValueChange={v => setData({...data, propertyType: v})}>
@@ -170,9 +177,6 @@ export function PropertiesPage() {
           </FormField>
           <FormField label="Area">
             <Input value={data.area || ''} onChange={e => setData({...data, area: e.target.value})} placeholder="e.g. Jebel Ali" />
-          </FormField>
-          <FormField label="Plot Number">
-            <Input value={data.plotNumber || ''} onChange={e => setData({...data, plotNumber: e.target.value})} />
           </FormField>
           <FormField label="Total Area (sqft)">
             <Input type="number" value={data.totalArea || ''} onChange={e => setData({...data, totalArea: parseFloat(e.target.value) || 0})} />

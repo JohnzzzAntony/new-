@@ -82,6 +82,7 @@ export function PropertyDetailPage() {
     landlordEmail: '',
     terms: '',
     notes: '',
+    plotNumber: '',
   })
 
   const loadAll = useCallback(async () => {
@@ -152,6 +153,7 @@ export function PropertyDetailPage() {
       landlordEmail: mainLease.landlordEmail || '',
       terms: mainLease.terms || '',
       notes: mainLease.notes || '',
+      plotNumber: property.plotNumber || '',
     })
     setIsEditingLease(true)
     setIsAddingLease(false)
@@ -179,6 +181,7 @@ export function PropertyDetailPage() {
       landlordEmail: '',
       terms: '',
       notes: '',
+      plotNumber: '',
     })
     setIsAddingLease(true)
     setIsEditingLease(false)
@@ -212,6 +215,8 @@ export function PropertyDetailPage() {
         landlordEmail: leaseForm.landlordEmail || null,
         terms: leaseForm.terms || null,
         notes: leaseForm.notes || null,
+        plotNumber: leaseForm.plotNumber || null,
+        propertyCode: leaseForm.plotNumber || null,
       }
 
       await propertiesApi.update(detailId!, payload)
@@ -333,7 +338,7 @@ export function PropertyDetailPage() {
       {/* Property Summary Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: 'Property Code', value: property.propertyCode, icon: <Building2 className="w-4 h-4 text-blue-500" /> },
+          { label: 'Plot No.', value: property.propertyCode, icon: <Building2 className="w-4 h-4 text-blue-500" /> },
           { label: 'Total Area', value: property.totalArea ? `${property.totalArea.toLocaleString()} sqft` : '—', icon: <Box className="w-4 h-4 text-purple-500" /> },
           { label: 'Main Tenant', value: property.company?.name || '—', icon: <Building2 className="w-4 h-4 text-emerald-500" /> },
           { label: 'Units', value: units.length, icon: <Box className="w-4 h-4 text-amber-500" /> },
@@ -407,6 +412,9 @@ export function PropertyDetailPage() {
                   </FormField>
                   <FormField label="Land Number">
                     <Input value={leaseForm.landNumber || ''} onChange={e => setLeaseForm({...leaseForm, landNumber: e.target.value})} placeholder="DREC Land #" />
+                  </FormField>
+                  <FormField label="Plot No.">
+                    <Input value={leaseForm.plotNumber || ''} onChange={e => setLeaseForm({...leaseForm, plotNumber: e.target.value})} placeholder="e.g. 0613-1208" />
                   </FormField>
                   <FormField label="Location">
                     <Input value={leaseForm.location || ''} onChange={e => setLeaseForm({...leaseForm, location: e.target.value})} placeholder="Location area" />

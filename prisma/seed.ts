@@ -335,7 +335,7 @@ async function main() {
     const property = await prisma.property.create({
       data: {
         name: propertyName,
-        propertyCode: `PROP-${row.contractNo}`,
+        propertyCode: row.plotNo,
         propertyType: PropertyType.INDUSTRIAL,
         description: `DREC Property - Contract #${row.contractNo}`,
         address: row.location || 'Dubai, UAE',

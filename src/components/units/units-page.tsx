@@ -79,7 +79,7 @@ export function UnitsPage() {
             <Select value={data.propertyId || ''} onValueChange={v => setData({...data, propertyId: v})}>
               <SelectTrigger><SelectValue placeholder="Select property" /></SelectTrigger>
               <SelectContent>
-                {properties.map(p => <SelectItem key={p.id} value={p.id}>{p.name} ({p.propertyCode})</SelectItem>)}
+                {properties.map(p => <SelectItem key={p.id} value={p.id}>{p.name} ({p.plotNumber || p.propertyCode || '—'})</SelectItem>)}
               </SelectContent>
             </Select>
           </FormField>

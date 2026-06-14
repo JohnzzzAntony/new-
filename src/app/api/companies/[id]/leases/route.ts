@@ -25,6 +25,8 @@ export async function GET(
         rentFrequency: true,
         leaseStatus: true,
         landlordName: true,
+        location: true,
+        landNumber: true,
       },
       orderBy: { leaseEndDate: 'asc' },
     });

@@ -47,6 +47,7 @@ model Company {
   registrationNo  String?
   tradeLicenseNo  String?
   tradeLicenseExpiry DateTime?
+  emiratesId      String?
   address         String?
   city            String?
   country         String   @default("UAE")

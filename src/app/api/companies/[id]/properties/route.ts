@@ -38,6 +38,7 @@ export async function GET(
         id: p.id,
         name: p.name,
         propertyCode: p.propertyCode,
+        plotNumber: p.plotNumber,
         propertyType: p.propertyType,
         description: p.description,
         address: p.address,

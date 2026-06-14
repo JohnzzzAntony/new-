@@ -149,6 +149,7 @@ export async function POST(request: NextRequest) {
         registrationNo: body.registrationNo,
         tradeLicenseNo: body.tradeLicenseNo,
         tradeLicenseExpiry: body.tradeLicenseExpiry ? new Date(body.tradeLicenseExpiry) : null,
+        emiratesId: body.emiratesId,
         address: body.address,
         city: body.city,
         country: body.country || 'UAE',
@@ -203,10 +204,26 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    const data: Record<string, unknown> = { ...updateData };
-    if (updateData.tradeLicenseExpiry) {
-      data.tradeLicenseExpiry = new Date(updateData.tradeLicenseExpiry);
+    const data: Record<string, any> = {};
+    if (body.name !== undefined) data.name = body.name;
+    if (body.tradeName !== undefined) data.tradeName = body.tradeName;
+    if (body.registrationNo !== undefined) data.registrationNo = body.registrationNo;
+    if (body.tradeLicenseNo !== undefined) data.tradeLicenseNo = body.tradeLicenseNo;
+    if (body.tradeLicenseExpiry !== undefined) {
+      data.tradeLicenseExpiry = body.tradeLicenseExpiry ? new Date(body.tradeLicenseExpiry) : null;
     }
+    if (body.emiratesId !== undefined) data.emiratesId = body.emiratesId;
+    if (body.address !== undefined) data.address = body.address;
+    if (body.city !== undefined) data.city = body.city;
+    if (body.country !== undefined) data.country = body.country;
+    if (body.phone !== undefined) data.phone = body.phone;
+    if (body.email !== undefined) data.email = body.email;
+    if (body.website !== undefined) data.website = body.website;
+    if (body.contactPerson !== undefined) data.contactPerson = body.contactPerson;
+    if (body.contactPhone !== undefined) data.contactPhone = body.contactPhone;
+    if (body.contactEmail !== undefined) data.contactEmail = body.contactEmail;
+    if (body.notes !== undefined) data.notes = body.notes;
+    if (body.isActive !== undefined) data.isActive = body.isActive;
 
     const company = await db.company.update({
       where: { id },

@@ -352,42 +352,6 @@ export function DashboardPage() {
       <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
         <div>
           <h2 className="text-lg font-bold text-gray-900">Executive Dashboard</h2>
-          <p className="text-xs text-gray-500">Real-time portfolio overview, compliance monitoring, and analytics.</p>
-        </div>
-        <div className="flex flex-wrap gap-2 items-center w-full md:w-auto">
-          {/* Company Filter */}
-          <div className="w-full sm:w-[180px]">
-            <Select value={selectedCompany} onValueChange={setSelectedCompany}>
-              <SelectTrigger className="h-9"><SelectValue placeholder="All Companies" /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Companies</SelectItem>
-                {companies.map(c => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Property Type Filter */}
-          <div className="w-full sm:w-[150px]">
-            <Select value={selectedPropertyType} onValueChange={setSelectedPropertyType}>
-              <SelectTrigger className="h-9"><SelectValue placeholder="All Types" /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Types</SelectItem>
-                {PROPERTY_TYPES.map(t => <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>)}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Date Range Selector */}
-          <div className="w-full sm:w-[150px]">
-            <Select value={selectedDateRange} onValueChange={setSelectedDateRange}>
-              <SelectTrigger className="h-9"><SelectValue placeholder="Date Range" /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="12m">Last 12 Months</SelectItem>
-                <SelectItem value="6m">Last 6 Months</SelectItem>
-                <SelectItem value="ytd">Year to Date (YTD)</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
         </div>
       </div>
 
